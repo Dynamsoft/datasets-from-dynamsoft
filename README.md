@@ -24,7 +24,7 @@ Real-world photos of Data Matrix barcodes captured at skewed angles. Useful for 
 |:------|:--------|
 | Symbology | Data Matrix |
 | Images | 42 |
-| Annotations | — |
+| Annotation format | JSON |
 
 ---
 
@@ -41,7 +41,32 @@ Synthetic UPS-style shipping label images created to test decoding of **Code128*
 
 ---
 
-### 4. [video-based-testing](./video-based-testing/)
+### 4. [challenging-images](./challenging-images/)
+
+A diverse collection of real-world barcode images covering a wide range of challenging scanning conditions. Useful for evaluating decoder robustness across lighting, print quality, density, orientation, and mixed-symbology scenarios.
+
+| Field | Details |
+|:------|:--------|
+| Symbologies | QR Code, Data Matrix, EAN-13, EAN-8, Code 128, Code 39, ITF, PDF417, UPC-A |
+| Images | 68 |
+| Barcodes | 514 |
+| Annotation format | JSON |
+
+#### Scenarios covered
+
+| Category | Examples |
+|:---------|:---------|
+| Lighting | Low light, strong light, shadows |
+| Print / physical condition | Crumpled barcodes, poorly printed, incomplete barcodes |
+| Barcode density | Dense barcodes, tiny barcodes |
+| Multi-barcode | Single-symbology multi-barcode, multiple-symbologies multi-barcode, batch scanning |
+| Domain-specific | Air travel (luggage & tickets), retail, healthcare |
+| Capture conditions | Off-screen barcodes, custom scan parameters |
+| Symbology-specific | Data Matrix variants |
+
+---
+
+### 5. [video-based-testing](./video-based-testing/)
 
 Frame-level annotations extracted from video sequences, covering a range of challenging real-world conditions. Organized into two sub-categories:
 
