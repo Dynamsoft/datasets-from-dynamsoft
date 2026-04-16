@@ -1,0 +1,393 @@
+{
+  "format": "barcode-benchmark/1.0",
+  "dataset": "test-results",
+  "total_images": 11,
+  "total_barcodes": 15,
+  "images": [
+    {
+      "file": "1-1-4_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06QMT4C27822C75 AE4KB7R0WF882EE3622399WBP16BCSU45F882EY24T3034052202MMNMJMM31MU3X48M",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "text": "[)>06SNP7F50155F08 DH7NE0U3ZI115HH6955622ZES49EFVX78I115HB57W6367385535PPQPM11N64PX6A71P",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "2-2-19_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06ID53X16711X64 TX3DU6K9PY771XX2511288PUJ05UVNN34Y771XR13M2923941191FF66C77D20FN2QN7F",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "4-3-11_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06RMO6E49044E97 CG6MD9T2YH004GG5844511YDR38DEUW67H004GA46V5256274424OOPOL00M53OW5Z60O",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "text": "[)>06ZUW4N27822N75 KO4UL7B0GP882OO3622399GLA16LMCE45P882OI24D3034052202WWXXT88U31WE3HE8W",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "5-5-9_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06YTV3M16711M64 JN3TK6A9FO771NN2511288FKZ05KLB D34O771NH13C2923941191VVWWS77T20VD2GD7V",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "6-5-14_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06CXZ7R50155R08 NR7XO0E3JS115RR6955622JOD49OPFH78S115RL57G6367385535ZZ00W11X64ZH6KH1Z",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "9-8-13_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06BWY6Q49044Q97 MQ6WN9D2IR004QQ5844511INC38NOEG67R004QK46F5256274424YYZZV00W53YG5JG0Y",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "text": "[)>06XSU2L05600L53 IM2SJ5Z8EN660MM1400177EJY94JKAC23N660MG02B1812830080UUVVR66S19UC1FC6U",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "10-9-11_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06ZUW4N27822N75 KO4UL7B0GP882OO3622399GLA16LMCE45P882OI24D3034052202WWXXT88U31WE3HE8W",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "12-18-20_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06HC42W05600W53 SW2CT5J8OX660WW1400177OTI94TUMM23X660WQ02L1812830080EE55B66C19EM1PM6E",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "13-1-14_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06QMT4C27822C75 AE4KB7R0WF882EE3622399WBP16BCSU45F882EY24T3034052202MMNMJMM31MU3X48M",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "16-6-15_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06DY08S61266S19 OS8YP1F4KT226SS7066733KPE50PQGI89T226SM68H7478496646AA11X22Y75AI7LI2A",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "text": "[)>06UPR9H72377H20 FJ9PG2W5BK337JJ8177844BGV61GHXZ90K337JD79Y8589507757RRSSO33P86RZ8C93R",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "file": "20-6-15_annotated",
+      "barcodes": [
+        {
+          "text": "[)>06UPR9H72377H20 FJ9PG2W5BK337JJ8177844BGV61GHXZ90K337JD79Y8589507757RRSSO33P86RZ8C93R",
+          "format": "PDF417",
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
