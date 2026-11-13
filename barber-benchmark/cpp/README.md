@@ -135,20 +135,20 @@ The full run uses one repetition on 7,894 unique BarBeR images in a single Ubunt
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader 11.6.50.29329 | 7,863 / 8,411 | 93.48% | 89 (1.06%) | 459 (5.46%) | 444.05 ms | 261.60 ms | 1422.82 ms |
-| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,467 / 8,411 | 88.78% | 245 (2.91%) | 699 (8.31%) | 105.73 ms | 89.78 ms | 229.06 ms |
+| Dynamsoft Barcode Reader 11.6.50.29329 | 8,046 / 8,411 | 95.66% | 89 (1.06%) | 276 (3.28%) | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,604 / 8,411 | 90.41% | 245 (2.91%) | 562 (6.68%) | 105.73 ms | 89.78 ms | 229.06 ms |
 | ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
 
 > **No precision column.** Precision would be correct predictions over all predictions, and its
 > denominator is the predictions rather than the annotations. On BarBeR that ratio is dominated by
-> two things outside a decoder's control: the annotations are curated rather than exhaustive, so a
-> barcode nobody annotated is charged as a false positive, and the canonical-format table counts
-> ROYAL_MAIL as a no-read for every decoder, so a correct read of one is charged as a false positive
-> too. It measures annotation coverage as much as decoder error, so it is not reported.
+> the fact that the annotations are curated rather than exhaustive: a second barcode on the same
+> photograph, or a symbology the dataset does not cover — DBR's Linux preset template detects
+> Pharmacode One-Track on images BarBeR has no annotation for — is charged as a false positive. It
+> measures annotation coverage as much as decoder error, so it is not reported.
 
-Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. The three separate almost entirely on no-reads (DBR 459, Scandit 699, ZXing-C++ 2,280); on wrong reads Scandit is the weakest of the three at 245, against DBR's 89 and ZXing-C++'s 100.
+Scandit read 1,573 more ground truth barcodes than ZXing-C++ and 442 fewer than DBR, a gap of 5.25 percentage points in recall against DBR and 18.71 points over ZXing-C++. The three separate almost entirely on no-reads (DBR 276, Scandit 562, ZXing-C++ 2,280); on wrong reads Scandit is the weakest of the three at 245, against DBR's 89 and ZXing-C++'s 100.
 
-Unsupported-format counts are DBR 192, Scandit 215, ZXing-C++ 227. The baseline 192 are ROYAL_MAIL instances that the shared canonical format table scores as unsupported for every reader because it strips underscores; Scandit adds 23 because it has no JAPAN_POST or POSTNET symbology, and ZXing-C++ adds 35 (those 23 plus KIX, IATA_2_OF_5 and USPS Intelligent Mail). Six DBR frames returned 'Operation timeout' and are counted as no-reads (`decoder_error`), never as wrong reads.
+Unsupported-format counts are DBR 0, Scandit 23, ZXing-C++ 227. Scandit's 23 are the JAPAN_POST (17) and POSTNET (6) annotations it has no symbology for; ZXing-C++ adds KIX, IATA_2_OF_5 and USPS Intelligent Mail to that. DBR supports every BarBeR symbology, so its whole no-read column is barcodes it did not return. Six DBR frames returned 'Operation timeout' and are counted as no-reads (`decoder_error`), never as wrong reads.
 
 **Timing caveat:** four worker processes handled disjoint manifest slices on 16 logical processors, so absolute decode times include CPU contention. Compare readers only within this run; do not compare these times with the earlier single-process Windows measurement. The Linux DCV build runs the official preset template with deep-learning models and is a different binary from that Windows build.
 
@@ -179,11 +179,16 @@ python tools/generate_benchmark_media.py `
 
 ## Matching Rules
 
+Protocol v2. v1 differed in three rules; every record in `results/full_linux/` was re-scored with the rules below and carries `"protocol": "protocol-v2"`.
+
 - Ground truth and predictions are matched one to one as multisets
 - The key is canonical barcode format plus exact normalized payload
 - UPC-A and the equivalent zero-prefixed EAN-13 value are treated as equal
 - CODE_39 start/stop asterisks are stripped before scoring
 - CODE_128 / GS1-128 leading `{GS}`, `{FNC1}`, and ASCII GS markers are stripped before scoring
+- **v2:** GS1 application identifiers printed in parentheses are unwrapped before comparison, so a reader that returns `(90)85320` matches the annotation `9085320`. Scoped to CODE_128 / GS1_128
+- **v2:** a `ROYAL_MAIL` payload that is the annotation's prefix, one character shorter, counts as the same reading. The Linux DBR build returns 10 of the 11 characters; the trailing character is not reconstructible from the payload with the tables available here, so the rule is limited to this one symbology and to a single missing character
+- **v2:** the canonical format table maps the underscored BarBeR labels `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` to the spellings the decoders use. v1 stripped the underscores before lookup, so those names matched no decoders' supported set and 192 readable annotations were scored as unsupported by all three readers
 - HTML entities, trailing newlines, and a leading `\000001` escape are normalized before scoring
 - Ground truth payload `^` is treated as an unreliable placeholder and excluded from scoring
 - DBR `CODE39EXTENDED` output is treated as `CODE_39`

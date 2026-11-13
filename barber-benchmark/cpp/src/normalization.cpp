@@ -52,9 +52,15 @@ std::string canonicalFormat(std::string_view value)
         {"DATABAR", "GS1_DATABAR"}, {"DATABAREXPANDED", "GS1_DATABAR_EXPANDED"},
         {"DATABARLIMITED", "GS1_DATABAR_LIMITED"},
         {"I2O5", "ITF"}, {"ITF", "ITF"}, {"INTERLEAVED2OF5", "ITF"},
-        {"IATA25", "IATA_2_OF_5"}, {"INTELLIGENTMAIL", "USPS_INTELLIGENT_MAIL"},
+        {"IATA25", "IATA_2_OF_5"},
+        {"INTELLIGENTMAIL", "USPS_INTELLIGENT_MAIL"},
         {"JAPANPOST", "JAPAN_POST"}, {"KIX", "KIX"}, {"PDF417", "PDF_417"},
         {"POSTNET", "POSTNET"}, {"QR", "QR_CODE"}, {"QRCODE", "QR_CODE"},
+        // BarBeR spells this one with an underscore. key() strips punctuation, so
+        // without this entry the ground-truth name reduces to ROYALMAIL and matches
+        // no decoder's supported set (protocol v1 scored all 192 annotations as
+        // unsupported).
+        {"ROYALMAIL", "ROYAL_MAIL"},
         {"ROYALMAILCODE", "ROYAL_MAIL"}, {"UPCA", "UPC_A"},
         {"UPCS", "UPC_A"}, {"UPCE", "UPC_E"}, {"1D", "GENERIC_1D"},
         {"GENERIC1D", "GENERIC_1D"}, {"UNKNOWN", "UNKNOWN"}, {"1", "UNKNOWN"}
@@ -116,6 +122,31 @@ bool isUnreliablePlaceholder(std::string_view payload)
     return payload == "^";
 }
 
+// GS1 readers that print the human-readable form wrap every application
+// identifier in parentheses: "(90)85320". BarBeR stores the raw element string
+// "9085320". Dropping only the parentheses keeps the AI digits, so the two
+// forms become comparable. Applied to the GS1-capable linear symbologies only.
+void unbracketGs1Ais(std::string& value)
+{
+    std::string out;
+    out.reserve(value.size());
+    for (std::size_t i = 0; i < value.size();) {
+        if (value[i] == '(') {
+            std::size_t j = i + 1;
+            while (j < value.size() && std::isdigit(static_cast<unsigned char>(value[j]))) ++j;
+            const auto count = j - (i + 1);
+            if (count >= 2 && count <= 4 && j < value.size() && value[j] == ')') {
+                out.append(value, i + 1, count);
+                i = j + 1;
+                continue;
+            }
+        }
+        out.push_back(value[i]);
+        ++i;
+    }
+    value.swap(out);
+}
+
 std::string normalizedPayload(std::string_view format, std::string_view payload)
 {
     std::string result = rstripNewlines(unescapeHtmlEntities(std::string(payload)));
@@ -126,8 +157,10 @@ std::string normalizedPayload(std::string_view format, std::string_view payload)
         result.erase(result.begin());
     if (canonical == "CODE_39" && result.size() >= 2 && result.front() == '*' && result.back() == '*')
         result = result.substr(1, result.size() - 2);
-    if (canonical == "CODE_128" || canonical == "GS1_128")
+    if (canonical == "CODE_128" || canonical == "GS1_128") {
         stripLeadingGs1Marker(result);
+        unbracketGs1Ais(result);
+    }
     return result;
 }
 

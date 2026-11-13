@@ -91,7 +91,7 @@ const combined = {
   audited_annotations: ANNOTATIONS,
   scored_ground_truth: SCORED,
   excluded_placeholders: ANNOTATIONS - SCORED,
-  note: "Recall = correct / 8,411. Every annotation resolves to correct, wrong read or no read, and the three sum to 8,411. A prediction no annotation claims is set aside rather than charged to an instance, because BarBeR's annotations are not exhaustive. Decode times are not comparable across runtimes.",
+  note: "Recall = correct / 8,411. Every annotation resolves to correct, wrong read or no read, and the three sum to 8,411. A prediction no annotation claims is set aside rather than charged to an instance, because BarBeR's annotations are not exhaustive. Matching rules: scoring protocol v2 (see README, section Scoring protocol v2). Decode times are not comparable across runtimes.",
   sources: [
     "js/results/full/summary.json",
     "cpp/results/full_linux/summary.json",

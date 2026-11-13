@@ -67,7 +67,8 @@
           "wrong_text": 22
         },
         "ROYAL_MAIL": {
-          "unsupported_format": 192
+          "correct": 183,
+          "not_found": 9
         },
         "UPC_A": {
           "correct": 317,
@@ -129,10 +130,9 @@
           "wrong_text": 10
         },
         "ZVZ-real.json": {
-          "correct": 687,
+          "correct": 870,
           "decoder_error": 1,
-          "not_found": 49,
-          "unsupported_format": 192,
+          "not_found": 58,
           "wrong_format": 4,
           "wrong_text": 58
         }
@@ -144,36 +144,35 @@
         0.9560938159480522,
         0.964539544860293
       ],
-      "correct": 7863,
-      "coverage_adjusted_recall": 0.934847223873499,
+      "correct": 8046,
+      "coverage_adjusted_recall": 0.9566044465580787,
       "coverage_adjusted_recall_ci95": [
-        0.9293719262645528,
-        0.9399254973169922
+        0.9520377612522579,
+        0.9607542429213372
       ],
       "eligible_instances": 8411,
       "errors": 6,
-      "f1": 0.8949465058046893,
-      "image_all_read_rate": 0.9337471497339752,
+      "f1": 0.9157750967448213,
+      "image_all_read_rate": 0.9569293134025842,
       "mean_decode_ms": 444.0451519646567,
       "median_decode_ms": 261.601014,
-      "no_read": 459,
+      "no_read": 276,
       "outcomes": {
-        "correct": 7863,
+        "correct": 8046,
         "decoder_error": 6,
-        "extra_result": 1209,
-        "not_found": 261,
-        "unsupported_format": 192,
+        "extra_result": 1026,
+        "not_found": 270,
         "wrong_format": 4,
         "wrong_text": 85
       },
       "p90_decode_ms": 872.835051,
       "p95_decode_ms": 1422.822846,
       "p99_decode_ms": 3508.531085,
-      "precision": 0.8583124113088091,
+      "precision": 0.8782883964632682,
       "records": 7894,
-      "supported_format_recall": 0.9566857281907775,
+      "supported_format_recall": 0.9566044465580787,
       "total_decode_ms": 3505292.429609,
-      "unsupported": 192,
+      "unsupported": 0,
       "wrong_reads": 89
     },
     "scandit-linux": {
@@ -240,7 +239,8 @@
           "wrong_text": 16
         },
         "ROYAL_MAIL": {
-          "unsupported_format": 192
+          "correct": 137,
+          "not_found": 55
         },
         "UPC_A": {
           "correct": 309,
@@ -302,9 +302,9 @@
           "wrong_text": 10
         },
         "ZVZ-real.json": {
-          "correct": 668,
-          "not_found": 52,
-          "unsupported_format": 215,
+          "correct": 805,
+          "not_found": 107,
+          "unsupported_format": 23,
           "wrong_format": 2,
           "wrong_text": 54
         }
@@ -316,35 +316,35 @@
         0.9060695614826703,
         0.9183235382064158
       ],
-      "correct": 7467,
-      "coverage_adjusted_recall": 0.8877660206871953,
+      "correct": 7604,
+      "coverage_adjusted_recall": 0.9040542147188206,
       "coverage_adjusted_recall_ci95": [
-        0.8808423838581224,
-        0.8943356194258719
+        0.8975743819848214,
+        0.910165137917265
       ],
       "eligible_instances": 8411,
       "errors": 0,
-      "f1": 0.8933955491744435,
-      "image_all_read_rate": 0.884849252596909,
+      "f1": 0.9097870303900455,
+      "image_all_read_rate": 0.9022042057258678,
       "mean_decode_ms": 105.732751442868,
       "median_decode_ms": 89.777927,
-      "no_read": 699,
+      "no_read": 562,
       "outcomes": {
-        "correct": 7467,
-        "extra_result": 593,
-        "not_found": 484,
-        "unsupported_format": 215,
+        "correct": 7604,
+        "extra_result": 456,
+        "not_found": 539,
+        "unsupported_format": 23,
         "wrong_format": 173,
         "wrong_text": 72
       },
       "p90_decode_ms": 183.922016,
       "p95_decode_ms": 229.063908,
       "p99_decode_ms": 337.811534,
-      "precision": 0.8990969295605057,
+      "precision": 0.9155930162552679,
       "records": 7894,
-      "supported_format_recall": 0.9110541727672035,
+      "supported_format_recall": 0.9065331425846447,
       "total_decode_ms": 834654.33989,
-      "unsupported": 215,
+      "unsupported": 23,
       "wrong_reads": 245
     },
     "zxing-cpp": {
@@ -520,6 +520,6 @@
       "wrong_reads": 100
     }
   },
-  "disclosure": "This benchmark was implemented and published by Dynamsoft, the developer of Dynamsoft Barcode Reader. It uses the public third-party BarBeR dataset. To make the comparison auditable, the protocol, source code, decoder configurations, environment details, dataset manifest, HTML report, and per-image raw results are provided. BarBeR's standardized annotations were generated with assistance from proprietary Datalogic software. Difficult undecodable barcode regions were manually localized and are excluded from decoding accuracy when no reliable payload is available. All readers receive the same RGB888 pixel buffer loaded once per image; only the decoder call is timed. Scandit is exercised through its Linux C API (8.7.1) with SC_PRESET_HIGH_EFFORT, a fresh frame sequence per still image, duplicate filtering off, full-image search with no direction assumption, light-on-dark decoding enabled, multi-scan enabled, and every BarBeR symbology the SDK exposes enabled. Multi-scan is requested when the trial license includes the tracking feature; otherwise the SDK falls back to single-code scanning, which is disclosed in the run output. Scandit 8.7.1 exposes no JAPAN_POST or POSTNET symbology, so those ground truth instances are scored as unsupported_format. The ROYAL_MAIL ground truth label is not in the canonical format table and is scored as unsupported_format for all three readers, matching the pre-existing protocol. Scandit trial licenses require network access; license or activation failures are reported as decoder errors, never as no-reads. Accuracy and timing were collected in one Linux container with four worker processes handling disjoint manifest slices, so absolute decode times include CPU contention and must not be compared with single-process measurements on other platforms; only the relative ordering within this run is meaningful. Six Dynamsoft frames returned 'Operation timeout' under this contention and are recorded as decoder_error. The Linux DCV build runs its official preset template with deep-learning models and is not the same binary as the earlier Windows measurement.",
+  "disclosure": "This benchmark was implemented and published by Dynamsoft, the developer of Dynamsoft Barcode Reader. It uses the public third-party BarBeR dataset. To make the comparison auditable, the protocol, source code, decoder configurations, environment details, dataset manifest, HTML report, and per-image raw results are provided. BarBeR's standardized annotations were generated with assistance from proprietary Datalogic software. Difficult undecodable barcode regions were manually localized and are excluded from decoding accuracy when no reliable payload is available. All readers receive the same RGB888 pixel buffer loaded once per image; only the decoder call is timed. Scandit is exercised through its Linux C API (8.7.1) with SC_PRESET_HIGH_EFFORT, a fresh frame sequence per still image, duplicate filtering off, full-image search with no direction assumption, light-on-dark decoding enabled, multi-scan enabled, and every BarBeR symbology the SDK exposes enabled. Multi-scan is requested when the trial license includes the tracking feature; otherwise the SDK falls back to single-code scanning, which is disclosed in the run output. Scandit 8.7.1 exposes no JAPAN_POST or POSTNET symbology, so those ground truth instances are scored as unsupported_format. Protocol v2 corrects three matching defects that v1 carried: the canonical format table now maps the underscored BarBeR labels (ROYAL_MAIL, IATA_2_OF_5, USPS_INTELLIGENT_MAIL) to their supported spellings, GS1 element strings printed with application identifiers in parentheses are compared with the parentheses removed, and a ROYAL_MAIL payload that is the annotation's prefix at the shorter length is accepted because the Linux DBR build returns 10 of the 11 characters. Scandit trial licenses require network access; license or activation failures are reported as decoder errors, never as no-reads. Accuracy and timing were collected in one Linux container with four worker processes handling disjoint manifest slices, so absolute decode times include CPU contention and must not be compared with single-process measurements on other platforms; only the relative ordering within this run is meaningful. Six Dynamsoft frames returned 'Operation timeout' under this contention and are recorded as decoder_error. The Linux DCV build runs its official preset template with deep-learning models and is not the same binary as the earlier Windows measurement.",
   "title": "ZXing-C++ vs. Dynamsoft Barcode Reader vs. Scandit Barcode Scanner SDK (Linux)"
 }

@@ -55,17 +55,23 @@ turns itself off. All decoded barcodes in that frame come back in `addedTrackedB
   leading-zero cases. Scandit has no `JAPAN_POST` or `POSTNET` symbology (17 + 6 BarBeR
   annotations), so those are scored as `unsupported_format`, the same treatment zxing-wasm gets
   for formats it cannot decode.
-- The supported-format sets are keyed by `canonicalFormat()` output. Format names containing
-  underscores (`ROYAL_MAIL`, `IATA_2_OF_5`, `USPS_INTELLIGENT_MAIL`) do not match any entry in
-  any decoder's supported set under the original protocol, so those annotations are counted as
-  `unsupported_format` (no-read) for **all three** decoders, and a barcode a decoder returns for
-  one of them is set aside rather than scored. This counting rule is unchanged from the original
-  two-decoder harness so that every published count stays reproducible.
+- The supported-format sets are keyed by `canonicalFormat()` output. Protocol v1 stripped
+  punctuation before the lookup, so the BarBeR labels `ROYAL_MAIL`, `IATA_2_OF_5` and
+  `USPS_INTELLIGENT_MAIL` reduced to `ROYALMAIL` / `IATA2OF5` / `USPSINTELLIGENTMAIL` and matched no
+  decoder's supported set — 196 readable annotations were scored as `unsupported_format` for **all
+  three** decoders, and the barcodes the readers did return were set aside. `FORMAT_MAPPING` now maps
+  those three stripped spellings back to the underscored canonical names.
 - Matching is a one-to-one multiset match on canonical format plus exact normalized payload.
   UPC-A/EAN-13 leading zeros, CODE_39 start/stop asterisks, CODE_128 GS1 markers, HTML entities,
   trailing newlines, and a leading `\000001` escape are normalized before scoring. Ground truth
   payload `^` is excluded, and DBR `CODE39EXTENDED` output is treated as `CODE_39`.
+- Two payload equivalences were added in v2. GS1 application identifiers printed in parentheses are
+  unwrapped for `CODE_128` / `GS1_128`, so zxing-wasm's `(90)85320` matches the annotation
+  `9085320`. A `ROYAL_MAIL` payload that is the annotation's prefix one character shorter counts as
+  the same reading, because the DBR Linux build returns 10 of the 11 characters; the rule is limited
+  to that symbology and to a single missing character.
 - Every record is appended to `results.jsonl`, so an interrupted run resumes where it stopped.
+  Records re-scored by `rematch_results.mjs` carry `"protocol": "protocol-js-v2"`.
 
 ## Project layout
 
@@ -195,32 +201,31 @@ to 8,411 for all three decoders.
 | Decoder | Correct | Recall | Wrong reads | No read | Mean decode | Median decode | P95 decode |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Dynamsoft Barcode Reader JS 11.6.5000 | **7,638 / 8,411** | **90.81%** | 90 (1.07%) | 683 (8.12%) | 157.88 ms | 125.75 ms | 380.20 ms |
-| Scandit Data Capture SDK 8.7.1 | 7,454 / 8,411 | 88.62% | **85 (1.01%)** | 872 (10.37%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
-| zxing-wasm 3.1.2 | 5,958 / 8,411 | 70.84% | 154 (1.83%) | 2,299 (27.33%) | 144.54 ms | 88.20 ms | 476.00 ms |
+| Scandit Data Capture SDK 8.7.1 | 7,589 / 8,411 | 90.23% | **85 (1.01%)** | 737 (8.76%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
+| zxing-wasm 3.1.2 | 6,019 / 8,411 | 71.56% | 94 (1.12%) | 2,298 (27.32%) | 144.54 ms | 88.20 ms | 476.00 ms |
 
 Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`), so correct + wrong reads + no read equals the 8,411 scored ground-truth instances. A prediction that no annotation claims is not a fourth outcome — the harness cannot tell an unannotated barcode from a hallucination on BarBeR — so it is set aside rather than charged to an instance. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
 
 > **No precision column.** Precision would be correct predictions over all predictions, and its
 > denominator is the predictions rather than the annotations. On BarBeR that ratio is dominated by
-> two things outside a decoder's control: the annotations are curated rather than exhaustive, so a
-> barcode nobody annotated is charged as a false positive, and the canonical-format table counts
-> `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` as no-reads for every decoder, so a
-> correct read of one is charged as a false positive too. It measures annotation coverage as much
-> as decoder error, so it is not reported.
+> the fact that the annotations are curated rather than exhaustive: a second barcode on the same
+> photograph, or a symbology the dataset does not cover, is charged as a false positive. It measures
+> annotation coverage as much as decoder error, so it is not reported.
 
-DBR read 184 more ground truth barcodes than Scandit, a lead of 2.19 percentage points in recall.
-Scandit read 1,496 more than zxing-wasm, a lead of 17.78 points in recall, and produced the fewest
-wrong reads (85 against DBR's 90 and zxing-wasm's 154). Scandit was the fastest decoder on every
+DBR read 49 more ground truth barcodes than Scandit, a lead of 0.58 percentage points in recall.
+Scandit read 1,570 more than zxing-wasm, a lead of 18.67 points in recall, and produced the fewest
+wrong reads (85 against DBR's 90 and zxing-wasm's 94). Scandit was the fastest decoder on every
 timing measure: 92.42 ms mean (versus 157.88 ms DBR and 144.54 ms zxing-wasm), 76.80 ms median and
-202.60 ms P95, both the lowest of the three. DBR's lead over Scandit comes entirely from the no-read
-column — 683 against 872, of which 196 and 219 are formats the decoder has no symbology for. Five
-images could not be decoded by the browser at all and are counted as no-reads (`decoder_error` in
-`outcomes`) for all three decoders; `validate_results.mjs` reports these 15 records as errors by
-design.
+202.60 ms P95, both the lowest of the three. DBR's lead over Scandit comes from the no-read column —
+683 against 737 — and Scandit's 23 unsupported annotations are the only ones either decoder cannot
+attempt. Five images could not be decoded by the browser at all and are counted as no-reads
+(`decoder_error` in `outcomes`) for all three decoders; `validate_results.mjs` reports these 15
+records as errors by design.
 
-The zxing-wasm and DBR accuracy numbers are identical to the original two-decoder run (5,958 and
-7,638 correct), confirming that adding Scandit did not change the scoring protocol; only the decode
-times differ because this run used headless Chrome on different hardware.
+The DBR accuracy numbers are identical to the original two-decoder run (7,638 correct), confirming
+that adding Scandit did not change the matching rules. zxing-wasm gains 61 correct readings under
+protocol v2 (5,958 → 6,019) from the GS1 parenthesis rule; only the decode times differ from the
+earlier run, because this one used headless Chrome on different hardware.
 
 ### Post-run correction (auditable)
 

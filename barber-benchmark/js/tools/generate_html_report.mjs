@@ -34,7 +34,7 @@ document.querySelectorAll('#q,#decoder,#outcome').forEach(e=>e.addEventListener(
 
 const cards = Object.entries(summary.decoders)
   .map(([name, value]) =>
-    `<div class="card"><h3>${escape(name)}</h3><div class="metric">${(value.coverage_adjusted_recall * 100).toFixed(1)}%</div>` +
+    `<div class="card"><h3>${escape(name)}</h3><div class="metric">${(value.coverage_adjusted_recall * 100).toFixed(2)}%</div>` +
     `<div class="muted">${value.correct.toLocaleString()}/${value.eligible_instances.toLocaleString()} exact` +
     ` &middot; ${value.wrong_reads.toLocaleString()} wrong reads &middot; ${value.no_read.toLocaleString()} no read` +
     ` &middot; mean ${value.mean_decode_ms.toFixed(1)} ms</div></div>`

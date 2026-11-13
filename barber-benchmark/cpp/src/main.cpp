@@ -209,7 +209,7 @@ int execute(const Options& options,bool smoke)
                 bench::DecodeRun run;
                 if(loaded)run=decoder->decode(image);else run.error="input_pipeline_error: "+error;
                 bench::RawResultRecord record;
-                record.protocol="protocol-v1";record.manifest_sha256=manifest_hash;
+                record.protocol="protocol-v2";record.manifest_sha256=manifest_hash;
                 record.sample=sample;record.decoder=decoder->name();record.decoder_version=decoder->version();
                 record.config_sha256=config_hashes.at(decoder->name());
                 record.repetition=repetition;record.image_load_ns=load_ns;record.run=std::move(run);
