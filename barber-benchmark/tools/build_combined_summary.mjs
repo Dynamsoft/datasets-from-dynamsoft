@@ -71,7 +71,6 @@ for (const run of RUNS) {
       scored_ground_truth: SCORED,
       correct: d.correct,
       recall_pct: +(d.coverage_adjusted_recall * 100).toFixed(2),
-      precision_pct: +(d.precision * 100).toFixed(2),
       wrong_reads: d.wrong_reads,
       no_read: d.no_read,
       extra_result: d.outcomes.extra_result || 0,
@@ -93,7 +92,7 @@ const combined = {
   audited_annotations: ANNOTATIONS,
   scored_ground_truth: SCORED,
   excluded_placeholders: ANNOTATIONS - SCORED,
-  note: "Recall = correct / 8,411. Precision = correct / (correct + wrong_text + wrong_format + extra_result). Decode times are not comparable across runtimes.",
+  note: "Recall = correct / 8,411. Extra results (predictions no annotation claims) are reported as raw counts; precision is not reported because BarBeR annotations are not exhaustive and the canonical-format table scores 196 annotations as unsupported. Decode times are not comparable across runtimes.",
   sources: [
     "js/results/full/summary.json",
     "cpp/results/full_linux/summary.json",
@@ -107,7 +106,7 @@ fs.writeFileSync(path.join(OUT, "combined-summary.json"), JSON.stringify(combine
 
 const columns = [
   "runtime", "decoder", "product", "records", "images", "scored_ground_truth",
-  "correct", "recall_pct", "precision_pct", "wrong_reads", "no_read",
+  "correct", "recall_pct", "wrong_reads", "no_read",
   "extra_result", "unsupported_format", "mean_decode_ms", "median_decode_ms", "p95_decode_ms",
 ];
 const csv = [columns.join(",")].concat(rows.map((r) => columns.map((c) => {
@@ -122,7 +121,7 @@ function table(run) {
     <td>${esc(d.product)}</td>
     <td class="num"><strong>${d.correct.toLocaleString()}</strong> / ${SCORED.toLocaleString()}</td>
     <td class="num"><strong>${d.recall_pct.toFixed(2)}%</strong></td>
-    <td class="num">${d.precision_pct.toFixed(2)}%</td>
+    <td class="num">${d.extra_result.toLocaleString()}</td>
     <td class="num">${d.wrong_reads.toLocaleString()}</td>
     <td class="num">${d.no_read.toLocaleString()}</td>
     <td class="num">${d.mean_decode_ms.toFixed(2)}</td>
@@ -131,7 +130,7 @@ function table(run) {
   </tr>`).join("");
   return `<h2>${esc(run.label)}</h2>
   <p class="muted">${esc(run.operating_system)} &middot; ${esc(run.processor)} &middot; ${run.records.toLocaleString()} decode records &middot; ${run.repetitions} repetition</p>
-  <table><thead><tr><th>Decoder</th><th>Correct</th><th>Recall</th><th>Precision</th><th>Wrong reads</th><th>No read</th><th>Mean ms</th><th>Median ms</th><th>P95 ms</th></tr></thead><tbody>${body}</tbody></table>`;
+  <table><thead><tr><th>Decoder</th><th>Correct</th><th>Recall</th><th>Extra results</th><th>Wrong reads</th><th>No read</th><th>Mean ms</th><th>Median ms</th><th>P95 ms</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
 const COLORS = { web: "#2563eb", cpp: "#0f9d8a" };
@@ -180,8 +179,8 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
 </div><p class="muted">Source: <a href="https://ditto.ing.unimore.it/barber/">BarBeR</a>, University of Modena and Reggio Emilia. Both runs use the same audited manifest and the same one-to-one multiset matching rules.</p></section>
 <section>${table(runs[0])}</section>
 <section>${table(runs[1])}</section>
-<section><h2>Recall (%)</h2>${barChart("recall_pct", "%")}<h2>Precision (%)</h2>${barChart("precision_pct", "%")}
-<p class="muted">Blue = Web/JavaScript, teal = C++/Linux. Decode times are <strong>not</strong> comparable across runtimes: the C++ run used four worker processes on a shared CPU inside Docker, while the Web run used a single headless Chrome session. Compare accuracy within each runtime and compare decoders within each run.</p></section>
+<section><h2>Recall (%)</h2>${barChart("recall_pct", "%")}
+<p class="muted">Blue = Web/JavaScript, teal = C++/Linux. Extra results are listed as counts rather than a precision rate: BarBeR's annotations are curated rather than exhaustive, and the canonical-format table scores 196 underscored annotations as unsupported, so the ratio would measure annotation coverage as much as decoder error. Decode times are <strong>not</strong> comparable across runtimes: the C++ run used four worker processes on a shared CPU inside Docker, while the Web run used a single headless Chrome session. Compare accuracy within each runtime and compare decoders within each run.</p></section>
 <section><h2>Full reports and raw data</h2><ul>
 <li><a href="../js/report/index.html">Web / JavaScript interactive report</a> (searchable per-image records)</li>
 <li><a href="../cpp/report/index.html">C++ / Linux interactive report</a> (searchable per-image records)</li>
@@ -194,6 +193,6 @@ fs.writeFileSync(path.join(OUT, "comparison.html"), page);
 
 for (const r of rows) {
   console.log(`${r.runtime.padEnd(4)} ${r.decoder.padEnd(26)} ${String(r.correct).padStart(5)}/${SCORED} ` +
-    `recall=${r.recall_pct.toFixed(2)}% precision=${r.precision_pct.toFixed(2)}% mean=${r.mean_decode_ms} ms`);
+    `recall=${r.recall_pct.toFixed(2)}% extras=${r.extra_result} mean=${r.mean_decode_ms} ms`);
 }
 console.log("wrote results/combined-summary.json, combined-summary.csv, comparison.html");

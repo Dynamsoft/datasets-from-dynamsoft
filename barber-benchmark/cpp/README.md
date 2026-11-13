@@ -131,21 +131,27 @@ python tools/validate_results.py `
 
 ## Benchmark Results
 
-The full run uses one repetition on 7,894 unique BarBeR images in a single Ubuntu 24.04 linux/amd64 container. Recall is correct ground truth matches divided by 8,411 scored ground truth instances. Precision is correct predictions divided by evaluated predictions.
+The full run uses one repetition on 7,894 unique BarBeR images in a single Ubuntu 24.04 linux/amd64 container. Recall is correct ground truth matches divided by 8,411 scored ground truth instances. Extra results are barcodes a decoder returns that no annotation claims; they are reported as raw counts, not as a rate, for the reason given under the table.
 
-| Decoder | Correct | Recall | Precision | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
+| Decoder | Correct | Recall | Extra results | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader 11.6.50.29329 | 7,863 / 8,411 | 93.48% | 85.83% | 89 (1.06%) | 459 (5.46%) | 444.05 ms | 261.60 ms | 1422.82 ms |
-| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,467 / 8,411 | 88.78% | 89.91% | 245 (2.91%) | 699 (8.31%) | 105.73 ms | 89.78 ms | 229.06 ms |
-| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 95.79% | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
+| Dynamsoft Barcode Reader 11.6.50.29329 | 7,863 / 8,411 | 93.48% | 1,209 | 89 (1.06%) | 459 (5.46%) | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,467 / 8,411 | 88.78% | 593 | 245 (2.91%) | 699 (8.31%) | 105.73 ms | 89.78 ms | 229.06 ms |
+| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 165 | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
 
-Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. Scandit's precision (89.91%) sits between ZXing-C++ (95.79%) and DBR (85.83%); DBR produced 1,209 extra results in this Linux preset-template configuration, which lowers its precision.
+> **No precision column.** Precision would be correct predictions over all predictions, and both of
+> its preconditions fail on BarBeR: the annotations are curated rather than exhaustive, and the
+> canonical-format table scores `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` as
+> unsupported, so 196 annotations are dropped while the reads that hit them still count as extras.
+> The resulting ratio measures annotation coverage as much as decoder error, so it is not reported.
+
+Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. DBR's 1,209 extra results are mostly false detections rather than missed annotations: 719 are Pharmacode One-Track / Two-Track reads, a symbology BarBeR does not annotate at all, produced by the Linux preset template; 188 are Royal Mail codes it decodes with an eleven-character payload; 128 are duplicate reads; 174 are payloads that appear in no annotation.
 
 Unsupported-format counts are DBR 192, Scandit 215, ZXing-C++ 227. 192 of these are ROYAL_MAIL instances that the pre-existing canonical format table scores as unsupported for every reader; Scandit additionally lacks JAPAN_POST and POSTNET. Six DBR frames returned 'Operation timeout' and are recorded as decoder_error, never as no-read.
 
 **Timing caveat:** four worker processes handled disjoint manifest slices on 16 logical processors, so absolute decode times include CPU contention. Compare readers only within this run; do not compare these times with the earlier single-process Windows measurement. The Linux DCV build runs the official preset template with deep-learning models and is a different binary from that Windows build.
 
-Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`). Extra results beyond the ground truth affect precision, not this split. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
+Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`). Extra results are counted separately and enter neither part. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
 
 ## Generate the Report
 

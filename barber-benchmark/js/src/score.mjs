@@ -263,6 +263,9 @@ export function generateSummary(records, { title } = {}) {
 
   const decoders = {};
   for (const [name, c] of Object.entries(totals)) {
+    // Kept for completeness only. Not reported: on BarBeR the annotations are not
+    // exhaustive and 196 underscored symbologies are scored as unsupported, so this
+    // ratio measures annotation coverage as much as decoder error.
     const falsePredictions = (c.outcomes.wrong_text || 0) + (c.outcomes.wrong_format || 0) + (c.outcomes.extra_result || 0);
     const precision = c.correct + falsePredictions ? c.correct / (c.correct + falsePredictions) : 0;
     const recall = c.eligible ? c.correct / c.eligible : 0;

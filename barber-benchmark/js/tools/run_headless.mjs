@@ -252,7 +252,7 @@ async function main() {
     console.log(
       `  ${name}: ${d.correct}/${d.eligible_instances} correct ` +
       `(${(d.coverage_adjusted_recall * 100).toFixed(2)}% recall, ` +
-      `${(d.precision * 100).toFixed(2)}% precision), ` +
+      `extras=${d.outcomes.extra_result || 0}), ` +
       `wrong_reads=${d.wrong_reads}, no_read=${d.no_read}, ` +
       `mean=${d.mean_decode_ms.toFixed(2)} ms, p95=${d.p95_decode_ms.toFixed(2)} ms`
     );

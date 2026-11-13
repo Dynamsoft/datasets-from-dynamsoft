@@ -17,5 +17,9 @@ results/smoke*/
 results/full_no_o2/
 results/full_partial_o2/
 
-# NOTE: manifests/, results/full_linux/ and report/ are intentionally INCLUDED in
-# this dataset repository — they are the published, auditable benchmark data.
+# The report generator copies its inputs here. They duplicate results/full_linux/
+# and are not shipped.
+report/downloads/
+
+# NOTE: manifests/, results/full_linux/ and report/index.html are intentionally
+# INCLUDED in this dataset repository — they are the published, auditable benchmark data.

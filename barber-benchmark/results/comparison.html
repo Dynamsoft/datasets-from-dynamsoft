@@ -24,11 +24,11 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
 </div><p class="muted">Source: <a href="https://ditto.ing.unimore.it/barber/">BarBeR</a>, University of Modena and Reggio Emilia. Both runs use the same audited manifest and the same one-to-one multiset matching rules.</p></section>
 <section><h2>Web / JavaScript (WASM)</h2>
   <p class="muted">win32 10.0.26200 &middot; 13th Gen Intel(R) Core(TM) i5-13400F &middot; 23,682 decode records &middot; 1 repetition</p>
-  <table><thead><tr><th>Decoder</th><th>Correct</th><th>Recall</th><th>Precision</th><th>Wrong reads</th><th>No read</th><th>Mean ms</th><th>Median ms</th><th>P95 ms</th></tr></thead><tbody><tr>
+  <table><thead><tr><th>Decoder</th><th>Correct</th><th>Recall</th><th>Extra results</th><th>Wrong reads</th><th>No read</th><th>Mean ms</th><th>Median ms</th><th>P95 ms</th></tr></thead><tbody><tr>
     <td>Dynamsoft Barcode Reader JS 11.6.5000</td>
     <td class="num"><strong>7,638</strong> / 8,411</td>
     <td class="num"><strong>90.81%</strong></td>
-    <td class="num">95.97%</td>
+    <td class="num">231</td>
     <td class="num">90</td>
     <td class="num">683</td>
     <td class="num">157.88</td>
@@ -38,7 +38,7 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
     <td>Scandit Data Capture SDK 8.7.1 (Web)</td>
     <td class="num"><strong>7,454</strong> / 8,411</td>
     <td class="num"><strong>88.62%</strong></td>
-    <td class="num">94.64%</td>
+    <td class="num">337</td>
     <td class="num">85</td>
     <td class="num">872</td>
     <td class="num">92.42</td>
@@ -48,7 +48,7 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
     <td>zxing-wasm 3.1.2</td>
     <td class="num"><strong>5,958</strong> / 8,411</td>
     <td class="num"><strong>70.84%</strong></td>
-    <td class="num">94.96%</td>
+    <td class="num">162</td>
     <td class="num">154</td>
     <td class="num">2,299</td>
     <td class="num">144.54</td>
@@ -57,11 +57,11 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
   </tr></tbody></table></section>
 <section><h2>C++ / Linux (native)</h2>
   <p class="muted">Ubuntu 24.04.5 LTS (Docker container, linux/amd64) &middot; 13th Gen Intel(R) Core(TM) i5-13400F &middot; 23,682 decode records &middot; 1 repetition</p>
-  <table><thead><tr><th>Decoder</th><th>Correct</th><th>Recall</th><th>Precision</th><th>Wrong reads</th><th>No read</th><th>Mean ms</th><th>Median ms</th><th>P95 ms</th></tr></thead><tbody><tr>
+  <table><thead><tr><th>Decoder</th><th>Correct</th><th>Recall</th><th>Extra results</th><th>Wrong reads</th><th>No read</th><th>Mean ms</th><th>Median ms</th><th>P95 ms</th></tr></thead><tbody><tr>
     <td>Dynamsoft Barcode Reader 11.6.50.29329 (Linux)</td>
     <td class="num"><strong>7,863</strong> / 8,411</td>
     <td class="num"><strong>93.48%</strong></td>
-    <td class="num">85.83%</td>
+    <td class="num">1,209</td>
     <td class="num">89</td>
     <td class="num">459</td>
     <td class="num">444.05</td>
@@ -71,7 +71,7 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
     <td>Scandit Barcode Scanner SDK 8.7.1 (Linux)</td>
     <td class="num"><strong>7,467</strong> / 8,411</td>
     <td class="num"><strong>88.78%</strong></td>
-    <td class="num">89.91%</td>
+    <td class="num">593</td>
     <td class="num">245</td>
     <td class="num">699</td>
     <td class="num">105.73</td>
@@ -81,15 +81,15 @@ a{color:#1769e0}@media print{body{background:#fff}section{box-shadow:none;break-
     <td>ZXing-C++ 3.1.1</td>
     <td class="num"><strong>6,031</strong> / 8,411</td>
     <td class="num"><strong>71.70%</strong></td>
-    <td class="num">95.79%</td>
+    <td class="num">165</td>
     <td class="num">100</td>
     <td class="num">2,280</td>
     <td class="num">70.90</td>
     <td class="num">38.51</td>
     <td class="num">265.90</td>
   </tr></tbody></table></section>
-<section><h2>Recall (%)</h2><svg viewBox="0 0 660 252" role="img" aria-label="recall_pct comparison"><text x="160" y="39" text-anchor="end" class="lbl">dynamsoft-dbr-js</text><rect x="170" y="27" width="390.5" height="18" rx="3" fill="#2563eb"/><text x="566.483" y="41" class="val">90.81%</text><text x="654" y="41" text-anchor="end" class="rt">web</text><text x="160" y="73" text-anchor="end" class="lbl">scandit-web-datacapture</text><rect x="170" y="61" width="381.1" height="18" rx="3" fill="#2563eb"/><text x="557.066" y="75" class="val">88.62%</text><text x="654" y="75" text-anchor="end" class="rt">web</text><text x="160" y="107" text-anchor="end" class="lbl">zxing-wasm</text><rect x="170" y="95" width="304.6" height="18" rx="3" fill="#2563eb"/><text x="480.612" y="109" class="val">70.84%</text><text x="654" y="109" text-anchor="end" class="rt">web</text><text x="160" y="149" text-anchor="end" class="lbl">dynamsoft-dbr</text><rect x="170" y="137" width="402.0" height="18" rx="3" fill="#0f9d8a"/><text x="577.964" y="151" class="val">93.48%</text><text x="654" y="151" text-anchor="end" class="rt">cpp</text><text x="160" y="183" text-anchor="end" class="lbl">scandit-linux</text><rect x="170" y="171" width="381.8" height="18" rx="3" fill="#0f9d8a"/><text x="557.754" y="185" class="val">88.78%</text><text x="654" y="185" text-anchor="end" class="rt">cpp</text><text x="160" y="217" text-anchor="end" class="lbl">zxing-cpp</text><rect x="170" y="205" width="308.3" height="18" rx="3" fill="#0f9d8a"/><text x="484.31000000000006" y="219" class="val">71.70%</text><text x="654" y="219" text-anchor="end" class="rt">cpp</text></svg><h2>Precision (%)</h2><svg viewBox="0 0 660 252" role="img" aria-label="precision_pct comparison"><text x="160" y="39" text-anchor="end" class="lbl">dynamsoft-dbr-js</text><rect x="170" y="27" width="412.7" height="18" rx="3" fill="#2563eb"/><text x="588.671" y="41" class="val">95.97%</text><text x="654" y="41" text-anchor="end" class="rt">web</text><text x="160" y="73" text-anchor="end" class="lbl">scandit-web-datacapture</text><rect x="170" y="61" width="407.0" height="18" rx="3" fill="#2563eb"/><text x="582.952" y="75" class="val">94.64%</text><text x="654" y="75" text-anchor="end" class="rt">web</text><text x="160" y="107" text-anchor="end" class="lbl">zxing-wasm</text><rect x="170" y="95" width="408.3" height="18" rx="3" fill="#2563eb"/><text x="584.328" y="109" class="val">94.96%</text><text x="654" y="109" text-anchor="end" class="rt">web</text><text x="160" y="149" text-anchor="end" class="lbl">dynamsoft-dbr</text><rect x="170" y="137" width="369.1" height="18" rx="3" fill="#0f9d8a"/><text x="545.069" y="151" class="val">85.83%</text><text x="654" y="151" text-anchor="end" class="rt">cpp</text><text x="160" y="183" text-anchor="end" class="lbl">scandit-linux</text><rect x="170" y="171" width="386.6" height="18" rx="3" fill="#0f9d8a"/><text x="562.613" y="185" class="val">89.91%</text><text x="654" y="185" text-anchor="end" class="rt">cpp</text><text x="160" y="217" text-anchor="end" class="lbl">zxing-cpp</text><rect x="170" y="205" width="411.9" height="18" rx="3" fill="#0f9d8a"/><text x="587.897" y="219" class="val">95.79%</text><text x="654" y="219" text-anchor="end" class="rt">cpp</text></svg>
-<p class="muted">Blue = Web/JavaScript, teal = C++/Linux. Decode times are <strong>not</strong> comparable across runtimes: the C++ run used four worker processes on a shared CPU inside Docker, while the Web run used a single headless Chrome session. Compare accuracy within each runtime and compare decoders within each run.</p></section>
+<section><h2>Recall (%)</h2><svg viewBox="0 0 660 252" role="img" aria-label="recall_pct comparison"><text x="160" y="39" text-anchor="end" class="lbl">dynamsoft-dbr-js</text><rect x="170" y="27" width="390.5" height="18" rx="3" fill="#2563eb"/><text x="566.483" y="41" class="val">90.81%</text><text x="654" y="41" text-anchor="end" class="rt">web</text><text x="160" y="73" text-anchor="end" class="lbl">scandit-web-datacapture</text><rect x="170" y="61" width="381.1" height="18" rx="3" fill="#2563eb"/><text x="557.066" y="75" class="val">88.62%</text><text x="654" y="75" text-anchor="end" class="rt">web</text><text x="160" y="107" text-anchor="end" class="lbl">zxing-wasm</text><rect x="170" y="95" width="304.6" height="18" rx="3" fill="#2563eb"/><text x="480.612" y="109" class="val">70.84%</text><text x="654" y="109" text-anchor="end" class="rt">web</text><text x="160" y="149" text-anchor="end" class="lbl">dynamsoft-dbr</text><rect x="170" y="137" width="402.0" height="18" rx="3" fill="#0f9d8a"/><text x="577.964" y="151" class="val">93.48%</text><text x="654" y="151" text-anchor="end" class="rt">cpp</text><text x="160" y="183" text-anchor="end" class="lbl">scandit-linux</text><rect x="170" y="171" width="381.8" height="18" rx="3" fill="#0f9d8a"/><text x="557.754" y="185" class="val">88.78%</text><text x="654" y="185" text-anchor="end" class="rt">cpp</text><text x="160" y="217" text-anchor="end" class="lbl">zxing-cpp</text><rect x="170" y="205" width="308.3" height="18" rx="3" fill="#0f9d8a"/><text x="484.31000000000006" y="219" class="val">71.70%</text><text x="654" y="219" text-anchor="end" class="rt">cpp</text></svg>
+<p class="muted">Blue = Web/JavaScript, teal = C++/Linux. Extra results are listed as counts rather than a precision rate: BarBeR's annotations are curated rather than exhaustive, and the canonical-format table scores 196 underscored annotations as unsupported, so the ratio would measure annotation coverage as much as decoder error. Decode times are <strong>not</strong> comparable across runtimes: the C++ run used four worker processes on a shared CPU inside Docker, while the Web run used a single headless Chrome session. Compare accuracy within each runtime and compare decoders within each run.</p></section>
 <section><h2>Full reports and raw data</h2><ul>
 <li><a href="../js/report/index.html">Web / JavaScript interactive report</a> (searchable per-image records)</li>
 <li><a href="../cpp/report/index.html">C++ / Linux interactive report</a> (searchable per-image records)</li>

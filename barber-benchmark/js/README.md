@@ -59,13 +59,12 @@ turns itself off. All decoded barcodes in that frame come back in `addedTrackedB
   underscores (`ROYAL_MAIL`, `IATA_2_OF_5`, `USPS_INTELLIGENT_MAIL`) do not match any entry in
   any decoder's supported set under the original protocol, so those annotations are counted as
   `unsupported_format` (no-read) for **all three** decoders, and any such barcode a decoder does
-  return is counted as an `extra_result` (affecting precision, not recall). This counting rule is
+  return is counted as an `extra_result`, reported as a separate count. This counting rule is
   unchanged from the original two-decoder harness.
-- Matching is a /EAN-13 leading zeros, CODE_39 start/stop asterisks, CODE_128 GS1 markers, HTML
-  entities, trailing newlines, and a leading `\000001` escape are normalized before scoring. Ground
-  truth payload `^` is excluded. DBR `CODE39EXTENDED` results fold into `CODE_39` when the payload
- fixed EAN-13 equivalent, and DBR `CODE39EXTENDED`
-  results fold into `CODE_39` when the payload matches.
+- Matching is a one-to-one multiset match on canonical format plus exact normalized payload.
+  UPC-A/EAN-13 leading zeros, CODE_39 start/stop asterisks, CODE_128 GS1 markers, HTML entities,
+  trailing newlines, and a leading `\000001` escape are normalized before scoring. Ground truth
+  payload `^` is excluded, and DBR `CODE39EXTENDED` output is treated as `CODE_39`.
 - Every record is appended to `results.jsonl`, so an interrupted run resumes where it stopped.
 
 ## Project layout
@@ -74,7 +73,7 @@ turns itself off. All decoded barcodes in that frame come back in `addedTrackedB
 benchmark/
 ├── src/
 │   ├── server.mjs            # collector + static/image server + scoring + finalize
-│   └── score.mjs             # canonical formats, matching, recall/precision/Wilson CI
+│   └── score.mjs             # canonical formats, matching, recall/Wilson CI
 ├── web/
 │   ├── index.html            # harness UI
 │   ├── benchmark.js          # manifest walk, timing, decode calls
@@ -190,28 +189,33 @@ This project, the [C++ benchmark](https://github.com/yushulx/cmake-cpp-barcode-q
 
 The full run uses one repetition on 7,894 unique BarBeR images, i.e. 23,682 per-image decode
 records. Recall is calculated as correct ground truth matches divided by 8,411 scored ground truth
-instances. Precision is calculated as correct predictions divided by evaluated predictions, where
-evaluated predictions are `correct + wrong_text + wrong_format + extra_result`.
+instances. Extra results are barcodes a decoder returns that no annotation claims; they are reported
+as raw counts, not as a rate, for the reason given under the table.
 
-| Decoder | Correct | Recall | Precision | Wrong reads | No read | Mean decode | Median decode | P95 decode |
+| Decoder | Correct | Recall | Extra results | Wrong reads | No read | Mean decode | Median decode | P95 decode |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader JS 11.6.5000 | **7,638 / 8,411** | **90.81%** | **95.97%** | 90 (1.07%) | 683 (8.12%) | 157.88 ms | 125.75 ms | 380.20 ms |
-| Scandit Data Capture SDK 8.7.1 | 7,454 / 8,411 | 88.62% | 94.64% | **85 (1.01%)** | 872 (10.37%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
-| zxing-wasm 3.1.2 | 5,958 / 8,411 | 70.84% | 94.96% | 154 (1.83%) | 2,299 (27.33%) | 144.54 ms | 88.20 ms | 476.00 ms |
+| Dynamsoft Barcode Reader JS 11.6.5000 | **7,638 / 8,411** | **90.81%** | 231 | 90 (1.07%) | 683 (8.12%) | 157.88 ms | 125.75 ms | 380.20 ms |
+| Scandit Data Capture SDK 8.7.1 | 7,454 / 8,411 | 88.62% | 337 | **85 (1.01%)** | 872 (10.37%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
+| zxing-wasm 3.1.2 | 5,958 / 8,411 | 70.84% | 162 | 154 (1.83%) | 2,299 (27.33%) | 144.54 ms | 88.20 ms | 476.00 ms |
 
-Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`), so correct + wrong reads + no read equals the 8,411 scored ground-truth instances. Extra results beyond the ground truth affect precision, not this split. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
+Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`), so correct + wrong reads + no read equals the 8,411 scored ground-truth instances. Extra results are counted separately and enter neither part. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
 
-DBR read 184 more ground truth barcodes than Scandit, a lead of 2.19 percentage points in recall and
-1.33 points in precision. Scandit read 1,496 more than zxing-wasm, a lead of 17.78 points in recall,
-and produced the fewest wrong reads (85 against DBR's 90 and zxing-wasm's 154). Scandit was the
-fastest decoder on every timing measure: 92.42 ms mean (versus 157.88 ms DBR and 144.54 ms
-zxing-wasm), 76.80 ms median and 202.60 ms P95, both the lowest of the three. Scandit's slightly
-lower precision is driven by 337 `extra_result` predictions (DBR 231, zxing-wasm 162), of which 135
-are `ROYAL_MAIL` — a format the original protocol's supported-format accounting treats as
-unsupported for all decoders, so a correct read of one still counts as an extra result. Five images
-could not be decoded by the browser at all and are counted as no-reads (`decoder_error` in
-`outcomes`) for all three decoders; `validate_results.mjs` reports these 15 records as errors by
-design.
+> **No precision column.** Precision would be correct predictions over all predictions, and both of
+> its preconditions fail on BarBeR: the annotations are curated rather than exhaustive, and the
+> canonical-format table scores `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` as
+> unsupported, so 196 annotations are dropped while the reads that hit them still count as extras.
+> The resulting ratio measures annotation coverage as much as decoder error, so it is not reported.
+
+DBR read 184 more ground truth barcodes than Scandit, a lead of 2.19 percentage points in recall.
+Scandit read 1,496 more than zxing-wasm, a lead of 17.78 points in recall, and produced the fewest
+wrong reads (85 against DBR's 90 and zxing-wasm's 154). Scandit was the fastest decoder on every
+timing measure: 92.42 ms mean (versus 157.88 ms DBR and 144.54 ms zxing-wasm), 76.80 ms median and
+202.60 ms P95, both the lowest of the three. The three decoders differ in how far their output
+overshoots the annotations — 231 extra results for DBR, 337 for Scandit, 162 for zxing-wasm — and
+135 of Scandit's are `ROYAL_MAIL`, a format the canonical table treats as unsupported for every
+decoder, so a correct read still lands outside the annotation set. Five images could not be decoded
+by the browser at all and are counted as no-reads (`decoder_error` in `outcomes`) for all three
+decoders; `validate_results.mjs` reports these 15 records as errors by design.
 
 The zxing-wasm and DBR accuracy numbers are identical to the original two-decoder run (5,958 and
 7,638 correct), confirming that adding Scandit did not change the scoring protocol; only the decode
@@ -225,8 +229,7 @@ spurious `wrong_format` outcomes. The harness now labels every Code 128 result `
 the convention used by the other two decoders, and the JSONL was re-scored with
 `tools/rematch_results.mjs`. **No matching rules, ground truth, or other decoder's results changed.**
 The pre-correction raw stream is kept in the source project (not shipped in this dataset
-repository); under those labels Scandit scored 7,287 / 8,411 (86.64% recall, 92.52% precision,
-252 wrong reads).
+repository); under those labels Scandit scored 7,287 / 8,411 (86.64% recall, 252 wrong reads).
 
 See `report/index.html` for the full interactive report (searchable per-image records, dataset audit
 card, method and disclosures). The raw `results/full/results.jsonl`, `results/full/summary.json`,
