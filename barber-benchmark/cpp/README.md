@@ -145,7 +145,7 @@ The full run uses one repetition on 7,894 unique BarBeR images in a single Ubunt
 > unsupported, so 196 annotations are dropped while the reads that hit them still count as extras.
 > The resulting ratio measures annotation coverage as much as decoder error, so it is not reported.
 
-Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. DBR's 1,209 extra results are mostly false detections rather than missed annotations: 719 are Pharmacode One-Track / Two-Track reads, a symbology BarBeR does not annotate at all, produced by the Linux preset template; 188 are Royal Mail codes it decodes with an eleven-character payload; 128 are duplicate reads; 174 are payloads that appear in no annotation.
+Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. DBR's 1,209 extra results are mostly false detections rather than missed annotations: 719 are Pharmacode One-Track / Two-Track reads, a symbology BarBeR does not annotate at all, produced by the Linux preset template; 188 are Royal Mail codes it reports without the trailing check character (10 characters against the annotation's 11); 128 are duplicate reads; 174 are payloads that appear in no annotation.
 
 Unsupported-format counts are DBR 192, Scandit 215, ZXing-C++ 227. 192 of these are ROYAL_MAIL instances that the pre-existing canonical format table scores as unsupported for every reader; Scandit additionally lacks JAPAN_POST and POSTNET. Six DBR frames returned 'Operation timeout' and are recorded as decoder_error, never as no-read.
 

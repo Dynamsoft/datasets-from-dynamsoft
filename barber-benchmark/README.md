@@ -135,8 +135,9 @@ Ubuntu 24.04 linux/amd64 container, 4 worker processes on disjoint manifest slic
 Scandit read 396 fewer barcodes than DBR (‑4.71 points of recall) and 1,436 more than ZXing-C++
 (+17.07 points). DBR's 1,209 extra results are mostly false detections rather than annotations it
 missed: 719 are Pharmacode One-Track / Two-Track reads, a symbology BarBeR does not annotate at all,
-produced by the Linux preset template; 188 are Royal Mail codes it decodes with an eleven-character
-payload; 128 are duplicate reads; 174 are payloads that appear in no annotation. Unsupported-format
+produced by the Linux preset template; 188 are Royal Mail codes it reports without the trailing
+check character (10 characters against the annotation's 11); 128 are duplicate reads; 174 are
+payloads that appear in no annotation. Unsupported-format
 counts: DBR 192, Scandit 215 (it has no JAPAN_POST / POSTNET symbology), ZXing-C++ 227. Six DBR
 frames returned "Operation timeout" and are recorded as `decoder_error`.
 
