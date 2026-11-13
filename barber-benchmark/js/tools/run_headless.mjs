@@ -251,8 +251,7 @@ async function main() {
   for (const [name, d] of Object.entries(summary.decoders)) {
     console.log(
       `  ${name}: ${d.correct}/${d.eligible_instances} correct ` +
-      `(${(d.coverage_adjusted_recall * 100).toFixed(2)}% recall, ` +
-      `extras=${d.outcomes.extra_result || 0}), ` +
+      `(${(d.coverage_adjusted_recall * 100).toFixed(2)}% recall), ` +
       `wrong_reads=${d.wrong_reads}, no_read=${d.no_read}, ` +
       `mean=${d.mean_decode_ms.toFixed(2)} ms, p95=${d.p95_decode_ms.toFixed(2)} ms`
     );

@@ -1,3 +1,10 @@
 node_modules/
 # User-supplied trial keys live one level up in ../licenses/ and are excluded there.
 results/smoke*/
+
+# The report generator copies its inputs here. They duplicate results/full/
+# and are not shipped.
+report/downloads/
+
+# NOTE: manifests/, results/full/ and report/index.html are intentionally
+# INCLUDED in this dataset repository — they are the published, auditable benchmark data.

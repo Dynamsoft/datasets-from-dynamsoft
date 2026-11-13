@@ -28,7 +28,7 @@ const STYLE = `
 const SCRIPT = `
 const rows=REPORT_ROWS,body=document.querySelector('#raw tbody');
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function render(){const q=document.querySelector('#q').value.toLowerCase(),d=document.querySelector('#decoder').value,o=document.querySelector('#outcome').value;body.innerHTML='';const matched=rows.filter(r=>(!d||r.decoder===d)&&(!o||r.matches.some(m=>m.outcome===o))&&JSON.stringify(r).toLowerCase().includes(q));document.querySelector('#shown').textContent=\`Showing \${Math.min(500,matched.length).toLocaleString()} of \${matched.length.toLocaleString()} matching records\`;matched.slice(0,500).forEach(r=>{const tr=document.createElement('tr'),out=r.matches.map(m=>m.outcome);tr.innerHTML=\`<td>\${esc(r.decoder)}</td><td>\${esc(r.relative_path)}</td><td>\${esc(r.annotation_file)}</td><td>\${r.ground_truth.filter(x=>x.decode_eligible).map(x=>esc(x.format)+': '+esc(x.text)).join('<br>')}</td><td>\${r.predictions.map(x=>esc(x.format)+': '+esc(x.text)).join('<br>')}</td><td class="\${out[0]||''}">\${out.map(esc).join(', ')}</td><td>\${(r.decode_ns/1e6).toFixed(2)}</td>\`;body.appendChild(tr)})}
+function render(){const q=document.querySelector('#q').value.toLowerCase(),d=document.querySelector('#decoder').value,o=document.querySelector('#outcome').value;body.innerHTML='';const matched=rows.filter(r=>(!d||r.decoder===d)&&(!o||r.matches.some(m=>m.outcome===o))&&JSON.stringify(r).toLowerCase().includes(q));document.querySelector('#shown').textContent=\`Showing \${Math.min(500,matched.length).toLocaleString()} of \${matched.length.toLocaleString()} matching records\`;matched.slice(0,500).forEach(r=>{const tr=document.createElement('tr'),out=r.matches.filter(m=>m.outcome!=='extra_result').map(m=>m.outcome);tr.innerHTML=\`<td>\${esc(r.decoder)}</td><td>\${esc(r.relative_path)}</td><td>\${esc(r.annotation_file)}</td><td>\${r.ground_truth.filter(x=>x.decode_eligible).map(x=>esc(x.format)+': '+esc(x.text)).join('<br>')}</td><td>\${r.predictions.map(x=>esc(x.format)+': '+esc(x.text)).join('<br>')}</td><td class="\${out[0]||''}">\${out.map(esc).join(', ')}</td><td>\${(r.decode_ns/1e6).toFixed(2)}</td>\`;body.appendChild(tr)})}
 document.querySelectorAll('#q,#decoder,#outcome').forEach(e=>e.addEventListener('input',render));render();
 `;
 
@@ -42,7 +42,9 @@ const cards = Object.entries(summary.decoders)
   .join("");
 
 const decoderOptions = [...new Set(rows.map((r) => r.decoder))].sort().map((x) => `<option>${escape(x)}</option>`).join("");
-const outcomes = [...new Set(rows.flatMap((r) => r.matches.map((m) => m.outcome)))].sort();
+const outcomes = [...new Set(rows.flatMap((r) => r.matches.map((m) => m.outcome)))]
+  .filter((x) => x !== "extra_result")
+  .sort();
 const outcomeOptions = outcomes.map((x) => `<option>${escape(x)}</option>`).join("");
 // Inject the rows as a JSON literal. Escape the two sequences that can break a
 // <script> block or a JS string: "</" (would close the script tag) and the raw
@@ -110,7 +112,7 @@ const document_ =
       escape(environment.scandit_barcode_package || "") +
       '. Scandit ran in ' + escape(environment.scandit_mode || "single-image mode") + '.</p>'
     : '') +
-  '</section><section><h2>Per-image results</h2><p class="muted">The interactive table displays up to 500 matching rows. The complete JSONL stream and a complete JSON package are included in the report downloads.</p><div class="controls"><input id="q" placeholder="Search image, format, payload"><select id="decoder"><option value="">All decoders</option>' +
+  '</section><section><h2>Per-image results</h2><p class="muted">The interactive table displays up to 500 matching rows. The Predictions column lists every barcode the reader returned for the image, including any that no annotation claims; the Outcomes column covers only the annotations. The complete JSONL stream, the summary, the source inventory and the environment snapshot are shipped under <code>results/full/</code>, <code>manifests/</code> and <code>configs/</code>.</p><div class="controls"><input id="q" placeholder="Search image, format, payload"><select id="decoder"><option value="">All decoders</option>' +
   decoderOptions +
   '</select><select id="outcome"><option value="">All outcomes</option>' +
   outcomeOptions +

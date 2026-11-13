@@ -131,27 +131,28 @@ python tools/validate_results.py `
 
 ## Benchmark Results
 
-The full run uses one repetition on 7,894 unique BarBeR images in a single Ubuntu 24.04 linux/amd64 container. Recall is correct ground truth matches divided by 8,411 scored ground truth instances. Extra results are barcodes a decoder returns that no annotation claims; they are reported as raw counts, not as a rate, for the reason given under the table.
+The full run uses one repetition on 7,894 unique BarBeR images in a single Ubuntu 24.04 linux/amd64 container. Recall is correct ground truth matches divided by 8,411 scored ground truth instances. Every annotation ends in exactly one of correct, wrong read or no read, and the three sum to 8,411 for all three decoders.
 
-| Decoder | Correct | Recall | Extra results | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader 11.6.50.29329 | 7,863 / 8,411 | 93.48% | 1,209 | 89 (1.06%) | 459 (5.46%) | 444.05 ms | 261.60 ms | 1422.82 ms |
-| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,467 / 8,411 | 88.78% | 593 | 245 (2.91%) | 699 (8.31%) | 105.73 ms | 89.78 ms | 229.06 ms |
-| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 165 | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
+| Decoder | Correct | Recall | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Dynamsoft Barcode Reader 11.6.50.29329 | 7,863 / 8,411 | 93.48% | 89 (1.06%) | 459 (5.46%) | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,467 / 8,411 | 88.78% | 245 (2.91%) | 699 (8.31%) | 105.73 ms | 89.78 ms | 229.06 ms |
+| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
 
-> **No precision column.** Precision would be correct predictions over all predictions, and both of
-> its preconditions fail on BarBeR: the annotations are curated rather than exhaustive, and the
-> canonical-format table scores `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` as
-> unsupported, so 196 annotations are dropped while the reads that hit them still count as extras.
-> The resulting ratio measures annotation coverage as much as decoder error, so it is not reported.
+> **No precision column.** Precision would be correct predictions over all predictions, and its
+> denominator is the predictions rather than the annotations. On BarBeR that ratio is dominated by
+> two things outside a decoder's control: the annotations are curated rather than exhaustive, so a
+> barcode nobody annotated is charged as a false positive, and the canonical-format table counts
+> ROYAL_MAIL as a no-read for every decoder, so a correct read of one is charged as a false positive
+> too. It measures annotation coverage as much as decoder error, so it is not reported.
 
-Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. DBR's 1,209 extra results are mostly false detections rather than missed annotations: 719 are Pharmacode One-Track / Two-Track reads, a symbology BarBeR does not annotate at all, produced by the Linux preset template; 188 are Royal Mail codes it reports without the trailing check character (10 characters against the annotation's 11); 128 are duplicate reads; 174 are payloads that appear in no annotation.
+Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. The three separate almost entirely on no-reads (DBR 459, Scandit 699, ZXing-C++ 2,280); on wrong reads Scandit is the weakest of the three at 245, against DBR's 89 and ZXing-C++'s 100.
 
-Unsupported-format counts are DBR 192, Scandit 215, ZXing-C++ 227. 192 of these are ROYAL_MAIL instances that the pre-existing canonical format table scores as unsupported for every reader; Scandit additionally lacks JAPAN_POST and POSTNET. Six DBR frames returned 'Operation timeout' and are recorded as decoder_error, never as no-read.
+Unsupported-format counts are DBR 192, Scandit 215, ZXing-C++ 227. The baseline 192 are ROYAL_MAIL instances that the shared canonical format table scores as unsupported for every reader because it strips underscores; Scandit adds 23 because it has no JAPAN_POST or POSTNET symbology, and ZXing-C++ adds 35 (those 23 plus KIX, IATA_2_OF_5 and USPS Intelligent Mail). Six DBR frames returned 'Operation timeout' and are counted as no-reads (`decoder_error`), never as wrong reads.
 
 **Timing caveat:** four worker processes handled disjoint manifest slices on 16 logical processors, so absolute decode times include CPU contention. Compare readers only within this run; do not compare these times with the earlier single-process Windows measurement. The Linux DCV build runs the official preset template with deep-learning models and is a different binary from that Windows build.
 
-Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`). Extra results are counted separately and enter neither part. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
+Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`), so correct + wrong reads + no read equals the 8,411 scored ground-truth instances. A prediction that no annotation claims is not a fourth outcome — the harness cannot tell an unannotated barcode from a hallucination on BarBeR — so it is set aside rather than charged to an instance. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
 
 ## Generate the Report
 

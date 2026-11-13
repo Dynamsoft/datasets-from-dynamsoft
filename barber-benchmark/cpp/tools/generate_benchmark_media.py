@@ -86,7 +86,7 @@ def decoder_cards(draw, summary, top, bottom, metric_label="Mean"):
         draw.text((x + 26, top + 30), display, font=fit_text(draw, display, width - 52, 36, True), fill=WHITE)
         values = [
             ("Recall", f'{metrics["coverage_adjusted_recall"] * 100:.2f}%'),
-            ("Extra results", f'{metrics["outcomes"].get("extra_result", 0):,}'),
+            ("Wrong reads", f'{metrics["wrong_reads"]:,}'),
             (metric_label, f'{metrics["mean_decode_ms"]:.2f} ms'),
         ]
         y = top + 108
