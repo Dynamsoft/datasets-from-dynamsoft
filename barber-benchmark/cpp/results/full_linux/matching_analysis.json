@@ -30,15 +30,15 @@
       "wrong_format:KIX->ROYAL_MAIL": 1
     },
     "dynamsoft-dbr": {
-      "wrong_text:PDF_417->PDF_417": 25,
+      "wrong_text:PDF_417->PDF_417": 27,
       "wrong_text:QR_CODE->QR_CODE": 22,
-      "wrong_text:CODE_128->CODE_128": 13,
+      "wrong_text:CODE_128->CODE_128": 12,
+      "wrong_text:EAN_13->EAN_13": 11,
       "wrong_text:AZTEC->AZTEC": 10,
-      "wrong_text:EAN_13->EAN_13": 8,
+      "wrong_text:CODE_39->CODE_39": 3,
       "wrong_text:DATA_MATRIX->DATA_MATRIX": 2,
-      "wrong_text:CODE_39->CODE_39": 2,
+      "wrong_text:ITF->ITF": 2,
       "wrong_text:POSTNET->POSTNET": 1,
-      "wrong_text:ITF->ITF": 1,
       "wrong_text:KIX->KIX": 1
     }
   },

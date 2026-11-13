@@ -206,7 +206,7 @@ to 8,411 for all three decoders.
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean decode | Median decode | P95 decode |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader JS 11.6.5000 | **7,642 / 8,411** | **90.86%** | 86 (1.02%) | 683 (8.12%) | 157.88 ms | 125.75 ms | 380.20 ms |
+| Dynamsoft Barcode Reader JS 11.6.5000 | **7,814 / 8,411** | **92.90%** | 89 (1.06%) | 508 (6.04%) | 192.59 ms | 113.60 ms | 413.50 ms |
 | Scandit Data Capture SDK 8.7.1 | 7,593 / 8,411 | 90.27% | **81 (0.96%)** | 737 (8.76%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
 | zxing-wasm 3.1.2 | 6,023 / 8,411 | 71.61% | 90 (1.07%) | 2,298 (27.32%) | 144.54 ms | 88.20 ms | 476.00 ms |
 
@@ -218,20 +218,25 @@ Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no r
 > photograph, or a symbology the dataset does not cover, is charged as a false positive. It measures
 > annotation coverage as much as decoder error, so it is not reported.
 
-DBR read 49 more ground truth barcodes than Scandit, a lead of 0.59 percentage points in recall.
+DBR read 221 more ground truth barcodes than Scandit, a lead of 2.63 percentage points in recall.
 Scandit read 1,570 more than zxing-wasm, a lead of 18.66 points in recall, and produced the fewest
-wrong reads (81 against DBR's 86 and zxing-wasm's 90). Scandit was the fastest decoder on every
-timing measure: 92.42 ms mean (versus 157.88 ms DBR and 144.54 ms zxing-wasm), 76.80 ms median and
+wrong reads (81 against DBR's 89 and zxing-wasm's 90). Scandit was the fastest decoder on every
+timing measure: 92.42 ms mean (versus 192.59 ms DBR and 144.54 ms zxing-wasm), 76.80 ms median and
 202.60 ms P95, both the lowest of the three. DBR's lead over Scandit comes from the no-read column —
-683 against 737 — and Scandit's 23 unsupported annotations are the only ones either decoder cannot
+508 against 737 — and Scandit's 23 unsupported annotations are the only ones either decoder cannot
 attempt. Five images could not be decoded by the browser at all and are counted as no-reads
 (`decoder_error` in `outcomes`) for all three decoders; `validate_results.mjs` reports these 15
 records as errors by design.
 
-Against the original two-decoder run, DBR gains 4 correct readings under protocol v2 (7,638 →
-7,642, from the GS1 format family) and zxing-wasm gains 65 (5,958 → 6,023: 61 from the GS1
-parenthesis rule and 4 from the same family rule). Only the decode times differ from the earlier run,
-because this one used headless Chrome on different hardware.
+Against the original two-decoder run, DBR gains 176 correct readings (7,638 → 7,814): 172 from
+decoding Royal Mail once `BF_ALL` is enabled and 4 from the GS1 format family. zxing-wasm gains 65
+(5,958 → 6,023: 61 from the GS1 parenthesis rule and 4 from the same family rule).
+
+DBR's records were re-measured in a separate headless session after `BF_ALL` was enabled, so its
+decode times are not from the same session as Scandit's and zxing-wasm's; the other two decoders'
+records are unchanged from the original run. Enabling `BF_ALL` has a cost: DBR's mean decode time
+rises from 157.88 to 192.59 ms, mostly because every image is now also searched for the postal and
+Pharmacode symbologies, not only the 192 Royal Mail ones (non-Royal-Mail images: 155.9 → 188.7 ms).
 
 ### Post-run correction (auditable)
 

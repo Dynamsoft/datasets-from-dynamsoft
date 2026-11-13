@@ -9,28 +9,28 @@
           "wrong_text": 10
         },
         "CODE_128": {
-          "correct": 1085,
-          "not_found": 22,
-          "wrong_text": 13
+          "correct": 1073,
+          "not_found": 35,
+          "wrong_text": 12
         },
         "CODE_39": {
-          "correct": 182,
-          "not_found": 14,
-          "wrong_text": 2
+          "correct": 178,
+          "not_found": 17,
+          "wrong_text": 3
         },
         "DATA_MATRIX": {
-          "correct": 105,
-          "not_found": 3,
+          "correct": 102,
+          "not_found": 6,
           "wrong_text": 2
         },
         "EAN_13": {
-          "correct": 4789,
-          "decoder_error": 4,
-          "not_found": 56,
-          "wrong_text": 8
+          "correct": 4761,
+          "not_found": 85,
+          "wrong_text": 11
         },
         "EAN_8": {
-          "correct": 68
+          "correct": 67,
+          "not_found": 1
         },
         "GS1_128": {
           "correct": 4
@@ -39,9 +39,9 @@
           "not_found": 3
         },
         "ITF": {
-          "correct": 67,
-          "not_found": 3,
-          "wrong_text": 1
+          "correct": 55,
+          "not_found": 14,
+          "wrong_text": 2
         },
         "JAPAN_POST": {
           "not_found": 17
@@ -51,9 +51,9 @@
           "wrong_text": 1
         },
         "PDF_417": {
-          "correct": 55,
-          "not_found": 7,
-          "wrong_text": 25
+          "correct": 47,
+          "not_found": 13,
+          "wrong_text": 27
         },
         "POSTNET": {
           "correct": 2,
@@ -61,9 +61,8 @@
           "wrong_text": 1
         },
         "QR_CODE": {
-          "correct": 1179,
-          "decoder_error": 2,
-          "not_found": 121,
+          "correct": 1167,
+          "not_found": 135,
           "wrong_text": 22
         },
         "ROYAL_MAIL": {
@@ -71,8 +70,8 @@
           "not_found": 9
         },
         "UPC_A": {
-          "correct": 317,
-          "not_found": 2
+          "correct": 315,
+          "not_found": 4
         },
         "USPS_INTELLIGENT_MAIL": {
           "not_found": 1
@@ -80,11 +79,12 @@
       },
       "by_source": {
         "Artelab Extended.json": {
-          "correct": 134
+          "correct": 133,
+          "not_found": 1
         },
         "Artelab.json": {
-          "correct": 420,
-          "not_found": 2,
+          "correct": 418,
+          "not_found": 4,
           "wrong_text": 1
         },
         "Bodnar.json": {
@@ -92,86 +92,83 @@
           "not_found": 1
         },
         "Deal Kaist.json": {
-          "correct": 2837,
-          "decoder_error": 3,
-          "not_found": 46,
-          "wrong_text": 4
+          "correct": 2820,
+          "not_found": 64,
+          "wrong_text": 6
         },
         "Dubska.json": {
-          "correct": 704,
-          "decoder_error": 2,
-          "not_found": 95
+          "correct": 702,
+          "not_found": 99
         },
         "InventBar.json": {
-          "correct": 517,
-          "not_found": 13
+          "correct": 516,
+          "not_found": 14
         },
         "Muenster.json": {
-          "correct": 1055,
-          "not_found": 6
+          "correct": 1051,
+          "not_found": 9,
+          "wrong_text": 1
         },
         "Open Food Facts.json": {
-          "correct": 145,
-          "not_found": 4
+          "correct": 140,
+          "not_found": 9
         },
         "ParcelBar.json": {
-          "correct": 803,
-          "not_found": 23,
+          "correct": 791,
+          "not_found": 35,
           "wrong_text": 10
         },
         "SKUU DSP Lab.json": {
-          "correct": 266,
-          "not_found": 9,
-          "wrong_text": 2
+          "correct": 252,
+          "not_found": 22,
+          "wrong_text": 3
         },
         "Szentandrasi-Dubska QR.json": {
-          "correct": 202,
-          "not_found": 13,
-          "wrong_text": 10
+          "correct": 196,
+          "not_found": 18,
+          "wrong_text": 11
         },
         "ZVZ-real.json": {
-          "correct": 874,
-          "decoder_error": 1,
-          "not_found": 58,
-          "wrong_text": 58
+          "correct": 856,
+          "not_found": 76,
+          "wrong_text": 59
         }
       },
-      "common_format_correct": 7865,
+      "common_format_correct": 7783,
       "common_format_eligible": 8184,
-      "common_format_recall": 0.9610215053763441,
+      "common_format_recall": 0.9510019550342131,
       "common_format_recall_ci95": [
-        0.9566074289655079,
-        0.9650029903313578
+        0.9461099090050319,
+        0.9554708112771656
       ],
-      "correct": 8050,
-      "coverage_adjusted_recall": 0.9570800142670313,
+      "correct": 7968,
+      "coverage_adjusted_recall": 0.9473308762335038,
       "coverage_adjusted_recall_ci95": [
-        0.9525359182800908,
-        0.9612067871086312
+        0.942349709547317,
+        0.9519036209313059
       ],
       "eligible_instances": 8411,
-      "errors": 6,
-      "f1": 0.9162303664921466,
-      "image_all_read_rate": 0.957182670382569,
-      "mean_decode_ms": 444.0451519646567,
-      "median_decode_ms": 261.601014,
-      "no_read": 276,
+      "errors": 0,
+      "f1": 0.9330757070086071,
+      "image_all_read_rate": 0.9490752470230555,
+      "mean_decode_ms": 97.02055262211807,
+      "median_decode_ms": 63.209159,
+      "no_read": 352,
       "outcomes": {
-        "correct": 8050,
-        "decoder_error": 6,
-        "extra_result": 1026,
-        "not_found": 270,
-        "wrong_text": 85
+        "correct": 7968,
+        "extra_result": 609,
+        "not_found": 352,
+        "wrong_text": 91
       },
-      "p90_decode_ms": 872.835051,
-      "p95_decode_ms": 1422.822846,
-      "p99_decode_ms": 3508.531085,
-      "precision": 0.878725030018557,
+      "p90_decode_ms": 167.256766,
+      "p95_decode_ms": 238.854472,
+      "p99_decode_ms": 666.664075,
+      "precision": 0.9192431933548685,
       "records": 7894,
-      "supported_format_recall": 0.9570800142670313,
-      "total_decode_ms": 3505292.429609,
+      "supported_format_recall": 0.9473308762335038,
+      "total_decode_ms": 765880.242399,
       "unsupported": 0,
-      "wrong_reads": 85
+      "wrong_reads": 91
     },
     "scandit-linux": {
       "by_format": {

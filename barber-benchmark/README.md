@@ -102,11 +102,11 @@ Full details: [`js/README.md`](./js/README.md) and [`js/report/index.html`](./js
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean | Median | P95 |
 |:--------|--------:|-------:|------------:|--------:|-----:|-------:|----:|
-| Dynamsoft Barcode Reader JS 11.6.5000 | **7,642 / 8,411** | **90.86%** | 86 | 683 | 157.88 ms | 125.75 ms | 380.20 ms |
+| Dynamsoft Barcode Reader JS 11.6.5000 | **7,814 / 8,411** | **92.90%** | 89 | 508 | 192.59 ms | 113.60 ms | 413.50 ms |
 | Scandit Data Capture SDK 8.7.1 (Web) | 7,593 / 8,411 | 90.27% | **81** | 737 | **92.42 ms** | **76.80 ms** | **202.60 ms** |
 | zxing-wasm 3.1.2 | 6,023 / 8,411 | 71.61% | 90 | 2,298 | 144.54 ms | 88.20 ms | 476.00 ms |
 
-Scandit read 49 fewer ground-truth barcodes than DBR (‑0.59 points of recall) and 1,570 more than
+Scandit read 221 fewer ground-truth barcodes than DBR (‑2.63 points of recall) and 1,570 more than
 zxing‑wasm (+18.66 points). It was fastest on every timing measure and produced the fewest wrong
 reads.
 
@@ -126,16 +126,16 @@ Ubuntu 24.04 linux/amd64 container, 4 worker processes on disjoint manifest slic
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean | Median | P95 |
 |:--------|--------:|-------:|------------:|--------:|-----:|-------:|----:|
-| Dynamsoft Barcode Reader 11.6.50.29329 (Linux) | **8,050 / 8,411** | **95.71%** | 85 | **276** | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Dynamsoft Barcode Reader 11.6.50.29329 (Linux) | **7,968 / 8,411** | **94.73%** | 91 | **352** | 97.02 ms | 63.21 ms | 238.85 ms |
 | Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,776 / 8,411 | 92.45% | **73** | 562 | 105.73 ms | 89.78 ms | **229.06 ms** |
 | ZXing-C++ 3.1.1 | 6,035 / 8,411 | 71.75% | 96 | 2,280 | **70.90 ms** | **38.51 ms** | 265.90 ms |
 
-Scandit read 274 fewer barcodes than DBR (‑3.26 points of recall) and 1,741 more than ZXing-C++
-(+20.70 points). It also produced the fewest wrong reads of the three (73 against DBR's 85 and
-ZXing-C++'s 96); the gap to DBR is the no-read column, 562 against 276. Unsupported formats account
-for Scandit 23 (it has no JAPAN_POST / POSTNET symbology) and ZXing-C++ 227; DBR supports every
-BarBeR symbology, so its whole no-read column is barcodes it did not return. Six DBR frames returned
-"Operation timeout" and are counted as no-reads.
+Scandit read 192 fewer barcodes than DBR (‑2.28 points of recall) and 1,741 more than ZXing-C++
+(+20.70 points). It produced the fewest wrong reads of the three (73 against DBR's 91 and ZXing-C++'s
+96); the gap to DBR is the no-read column, 562 against 352. Unsupported formats account for Scandit
+23 (it has no JAPAN_POST / POSTNET symbology) and ZXing-C++ 227; DBR supports every BarBeR symbology,
+so its whole no-read column is barcodes it did not return. Six DBR frames returned "Operation
+timeout" and are counted as no-reads.
 
 > **Timing caveat:** four worker processes shared 16 logical processors, so absolute decode times
 > include CPU contention. The Linux DCV build also runs the official preset template with
@@ -174,19 +174,25 @@ from the same predictions with `rematch` and now carries `"protocol": "protocol-
    Scandit sets a carrier flag — so scoring the name a vendor happens to use penalised Scandit with
    172 wrong formats on Linux while paying DBR and ZXing the same grace through a different channel.
    Payloads still have to match exactly.
+5. **The two DBR runs now use the same configuration.** Both read the `ReadBarcodes_Default` preset
+   with `BF_ALL` enabled and no barcode-count hint. v1 passed DBR a dataset-level
+   `expectedBarcodesCount` of 14 (the manifest holds two images with 14 barcodes), so every
+   one-barcode image was searched as if 14 were present; on a single image that setting cost 11.7x
+   the decode time, and it is why the Linux build looked 3x slower than the browser. The browser run
+   also never enabled `BF_ALL`, which is why it could not read Royal Mail at all.
 
 | Run | Decoder | v1 | v2 | Δ |
 |:----|:--------|:---|---:|---:|
-| Web | Dynamsoft Barcode Reader JS | 7,638 · 90.81% | 7,642 · 90.86% | +4 · +0.05 |
+| Web | Dynamsoft Barcode Reader JS | 7,638 · 90.81% | 7,814 · 92.90% | +176 · +2.09 |
 | Web | Scandit Data Capture SDK | 7,454 · 88.62% | 7,593 · 90.27% | +139 · +1.65 |
 | Web | zxing-wasm | 5,958 · 70.84% | 6,023 · 71.61% | +65 · +0.77 |
-| Linux | Dynamsoft Barcode Reader | 7,863 · 93.48% | 8,050 · 95.71% | +187 · +2.23 |
+| Linux | Dynamsoft Barcode Reader | 7,863 · 93.48% | 7,968 · 94.73% | +105 · +1.25 |
 | Linux | Scandit Barcode Scanner SDK | 7,467 · 88.78% | 7,776 · 92.45% | +309 · +3.67 |
 | Linux | ZXing-C++ | 6,031 · 71.70% | 6,035 · 71.75% | +4 · +0.05 |
 
-The ranking is unchanged in both runtimes. Scandit gains the most because it is the only reader that
-names the GS1 convention separately, and the Linux DBR gain is larger than the Web DBR gain because
-only the native build decodes Royal Mail at all.
+The ranking is unchanged in both runtimes. Scandit gains the most on Linux because it is the only
+reader that names the GS1 convention separately; on the Web side the largest gain is DBR's, which
+now decodes Royal Mail on both runtimes instead of only on Linux.
 
 ## Cross-runtime observations
 
@@ -194,13 +200,12 @@ only the native build decodes Royal Mail at all.
   different SDKs (Web WASM / Linux C API), engines and symbology configurations.
 - **ZXing is likewise close**: 71.61% (zxing-wasm 3.1.2) vs 71.75% (ZXing-C++ 3.1.1), as expected
   from the same underlying C++ core.
-- **DBR differs most**: 90.86% on Web vs 95.71% on Linux. The Linux build runs the deep-learning
-  model preset template and detects more aggressively — it resolves 408 more of the 8,411
-  annotations and leaves 407 fewer unread — and 183 of that gain is Royal Mail, which only the
-  native build decodes. Those are two different product builds, not the same decoder in two
-  languages.
-- In both runtimes the ranking by recall is **DBR > Scandit > ZXing**, and Scandit consistently
-  leads on decode latency.
+- **DBR differs most**: 92.90% on Web vs 94.73% on Linux; the native build resolves 154 more of the
+  8,411 annotations and leaves 156 fewer unread. Those are two different product builds, not the
+  same decoder in two languages.
+- In both runtimes the ranking by recall is **DBR > Scandit > ZXing**. Scandit leads on decode
+  latency in the browser; on Linux it is the slowest of the three on the mean, because DBR's
+  deep-learning preset is only ~1.1x its time there.
 
 ---
 

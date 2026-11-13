@@ -135,7 +135,7 @@ The full run uses one repetition on 7,894 unique BarBeR images in a single Ubunt
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader 11.6.50.29329 | **8,050 / 8,411** | **95.71%** | 85 (1.01%) | **276 (3.28%)** | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Dynamsoft Barcode Reader 11.6.50.29329 | **7,968 / 8,411** | **94.73%** | 91 (1.08%) | **352 (4.19%)** | 97.02 ms | 63.21 ms | 238.85 ms |
 | Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,776 / 8,411 | 92.45% | **73 (0.87%)** | 562 (6.68%) | 105.73 ms | 89.78 ms | **229.06 ms** |
 | ZXing-C++ 3.1.1 | 6,035 / 8,411 | 71.75% | 96 (1.14%) | 2,280 (27.11%) | **70.90 ms** | **38.51 ms** | 265.90 ms |
 
@@ -146,11 +146,11 @@ The full run uses one repetition on 7,894 unique BarBeR images in a single Ubunt
 > Pharmacode One-Track on images BarBeR has no annotation for — is charged as a false positive. It
 > measures annotation coverage as much as decoder error, so it is not reported.
 
-Scandit read 1,741 more ground truth barcodes than ZXing-C++ and 274 fewer than DBR, a gap of 3.26 percentage points in recall behind DBR and 20.70 points ahead of ZXing-C++. It also produced the fewest wrong reads of the three (73, against DBR's 85 and ZXing-C++'s 96); what separates it from DBR is the no-read column, 562 against 276.
+Scandit read 1,741 more ground truth barcodes than ZXing-C++ and 192 fewer than DBR, a gap of 2.28 percentage points in recall behind DBR and 20.70 points ahead of ZXing-C++. It also produced the fewest wrong reads of the three (73, against DBR's 91 and ZXing-C++'s 96); what separates it from DBR is the no-read column, 562 against 352.
 
-Unsupported-format counts are DBR 0, Scandit 23, ZXing-C++ 227. Scandit's 23 are the JAPAN_POST (17) and POSTNET (6) annotations it has no symbology for; ZXing-C++ adds KIX, IATA_2_OF_5 and USPS Intelligent Mail to that. DBR supports every BarBeR symbology, so its whole no-read column is barcodes it did not return. Six DBR frames returned 'Operation timeout' and are counted as no-reads (`decoder_error`), never as wrong reads.
+Unsupported-format counts are DBR 0, Scandit 23, ZXing-C++ 227. Scandit's 23 are the JAPAN_POST (17) and POSTNET (6) annotations it has no symbology for; ZXing-C++ adds KIX, IATA_2_OF_5 and USPS Intelligent Mail to that. DBR supports every BarBeR symbology, so its whole no-read column is barcodes it did not return. It runs the `ReadBarcodes_Default` preset with `BF_ALL` and no barcode-count hint, so the decoder decides how many codes to look for; an earlier revision passed a dataset-level `expectedBarcodesCount` of 14, which made every one-barcode image search as if 14 were present and cost 4.3x the decode time for 82 extra reads. Six DBR frames returned 'Operation timeout' and are counted as no-reads (`decoder_error`), never as wrong reads.
 
-**Timing caveat:** four worker processes handled disjoint manifest slices on 16 logical processors, so absolute decode times include CPU contention. Compare readers only within this run; do not compare these times with the earlier single-process Windows measurement. The Linux DCV build runs the official preset template with deep-learning models and is a different binary from that Windows build.
+**Timing caveat:** four worker processes handled disjoint manifest slices on 16 logical processors, so absolute decode times include CPU contention (measured at roughly 1.3x on a 987-image subset). Compare readers only within this run; do not compare these times with the earlier single-process Windows measurement. The Linux DCV build runs the official preset template with deep-learning models and is a different binary from that Windows build.
 
 Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`), so correct + wrong reads + no read equals the 8,411 scored ground-truth instances. A prediction that no annotation claims is not a fourth outcome — the harness cannot tell an unannotated barcode from a hallucination on BarBeR — so it is set aside rather than charged to an instance. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
 
