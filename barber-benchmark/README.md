@@ -150,49 +150,6 @@ timeout" and are counted as no-reads.
 > is reported: its denominator would be predictions rather than annotations, and on this dataset the
 > ratio measures how much a decoder reads beyond the annotation file.
 
-## Scoring protocol v2
-
-The first publication of these tables used protocol v1. Three matching defects were found in review
-and are now fixed; **no decoder was re-run and no decode time changed** — every record was re-scored
-from the same predictions with `rematch` and now carries `"protocol": "protocol-v2"`.
-
-1. **Underscored ground-truth labels.** The canonical-format table strips punctuation before lookup,
-   so `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` reduced to `ROYALMAIL` /
-   `IATA2OF5` / `USPSINTELLIGENTMAIL` and matched no decoder's supported set. Every reader was
-   charged for that — 196 annotations in the Web run, 192 in the Linux run — and the Royal Mail
-   codes the Linux decoders did return were set aside. Those three spellings now map to the names
-   the decoders use.
-2. **GS1 application identifiers in parentheses.** zxing-wasm reports `(90)85320` where the
-   annotation holds the raw element string `9085320`. The parentheses are now unwrapped for
-   Code 128, which recovers 61 readings.
-3. **Royal Mail payload length.** The Linux DBR build returns 10 of the 11 characters the annotation
-   holds. A one-character prefix now counts as the same reading, for that symbology only.
-4. **Code 128 and GS1-128 are one format family.** GS1-128 is Code 128 carrying GS1 data: same bars,
-   same code sets, same check character, with an FNC1 in the first data position as the only
-   difference (AIM separates them as `]C0` / `]C1`). The readers report that fact through three
-   different channels — DBR prefixes the payload with `{GS}`, zxing exposes the AIM identifier,
-   Scandit sets a carrier flag — so scoring the name a vendor happens to use penalised Scandit with
-   172 wrong formats on Linux while paying DBR and ZXing the same grace through a different channel.
-   Payloads still have to match exactly.
-5. **The two DBR runs now use the same configuration.** Both read the `ReadBarcodes_Default` preset
-   with `BF_ALL` enabled and no barcode-count hint. v1 passed DBR a dataset-level
-   `expectedBarcodesCount` of 14 (the manifest holds two images with 14 barcodes), so every
-   one-barcode image was searched as if 14 were present; on a single image that setting cost 11.7x
-   the decode time, and it is why the Linux build looked 3x slower than the browser. The browser run
-   also never enabled `BF_ALL`, which is why it could not read Royal Mail at all.
-
-| Run | Decoder | v1 | v2 | Δ |
-|:----|:--------|:---|---:|---:|
-| Web | Dynamsoft Barcode Reader JS | 7,638 · 90.81% | 7,814 · 92.90% | +176 · +2.09 |
-| Web | Scandit Data Capture SDK | 7,454 · 88.62% | 7,593 · 90.27% | +139 · +1.65 |
-| Web | zxing-wasm | 5,958 · 70.84% | 6,023 · 71.61% | +65 · +0.77 |
-| Linux | Dynamsoft Barcode Reader | 7,863 · 93.48% | 7,968 · 94.73% | +105 · +1.25 |
-| Linux | Scandit Barcode Scanner SDK | 7,467 · 88.78% | 7,776 · 92.45% | +309 · +3.67 |
-| Linux | ZXing-C++ | 6,031 · 71.70% | 6,035 · 71.75% | +4 · +0.05 |
-
-The ranking is unchanged in both runtimes. Scandit gains the most on Linux because it is the only
-reader that names the GS1 convention separately; on the Web side the largest gain is DBR's, which
-now decodes Royal Mail on both runtimes instead of only on Linux.
 
 ## Cross-runtime observations
 
@@ -207,30 +164,6 @@ now decodes Royal Mail on both runtimes instead of only on Linux.
   latency in the browser; on Linux it is the slowest of the three on the mean, because DBR's
   deep-learning preset is only ~1.1x its time there.
 
----
-
-## Method and scoring
-
-Both harnesses follow the same protocol-v2 rules (the companion Python benchmark still runs v1):
-
-- Every image is loaded once into a shared RGB888 / canvas buffer; **only the decoder call is
-  timed**. Image loading, matching and serialization are excluded.
-- Decoder order is shuffled per (image, repetition) with a seeded PRNG.
-- Predictions and ground truth are matched one-to-one as multisets on canonical format plus exact
-  normalized payload. UPC-A/EAN-13 leading zeros, Code 39 asterisks, Code 128 GS1 markers, GS1
-  application identifiers in parentheses, a one-character Royal Mail prefix, HTML entities,
-  trailing newlines and a leading `\000001` escape are normalized. Code 128 and GS1-128 are one
-  format family, because GS1-128 is Code 128 carrying GS1 data rather than a separate symbology.
-  The `^` placeholder is excluded and barcode location is not scored.
-- Every annotation resolves to exactly one outcome: **correct**, **wrong read**
-  (`wrong_text + wrong_format`) or **no read** (`not_found + unsupported_format + decoder_error`),
-  and the three sum to the 8,411 scored annotations. A prediction that no annotation claims is
-  discarded instead of being charged to an instance, because the annotation file is not exhaustive.
-- Scandit reports EAN-13/UPC-A as one combined symbology (split by payload length) and has no
-  JAPAN_POST/POSTNET symbology, which is the only reason it has any unsupported annotations at all.
-  See [Scoring protocol v2](#scoring-protocol-v2) for what changed from the first publication.
-
----
 
 ## Reproduce
 
