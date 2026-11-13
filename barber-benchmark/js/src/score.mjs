@@ -1,6 +1,8 @@
 /**
  * Scoring library for the zxing-wasm vs. Dynamsoft Barcode Reader vs. Scandit JS benchmark.
- * Protocol v2 (was v1): same decode records, three matching corrections.
+ * Protocol v2 (was v1): same decode records, four matching corrections — the canonical
+ * format mapping for underscored labels, GS1 AI parentheses, the ROYAL_MAIL trailing
+ * character, and treating CODE_128 / GS1_128 as one format family.
  * - canonical format mapping plus payload normalization (UPC-A / EAN-13, CODE_39 asterisks,
  *   CODE_128 GS1 markers, GS1 AI parentheses, ROYAL_MAIL trailing character, HTML entities,
  *   trailing newlines, leading \\000001)
@@ -79,6 +81,19 @@ const FORMAT_MAPPING = {
 export function canonicalFormat(value) {
   const key = String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   return FORMAT_MAPPING[key] || key;
+}
+
+// GS1-128 is Code 128 carrying GS1 data: the same bars, the same code sets, the
+// same check character, with an FNC1 in the first data position as the only
+// difference. AIM distinguishes them by symbology identifier (]C0 vs ]C1), which
+// is a data convention, not a different symbology. The readers report that fact
+// through three different channels — DBR prefixes the payload with {GS}, zxing
+// exposes the identifier, Scandit sets a GS1 carrier flag — so scoring must not
+// depend on which channel a vendor picked. Both names are one format family for
+// matching; payloads still have to match exactly.
+export function formatFamily(value) {
+  const canonical = canonicalFormat(value);
+  return canonical === "GS1_128" ? "CODE_128" : canonical;
 }
 
 function unescapeHtmlEntities(value) {
@@ -185,12 +200,12 @@ export function matchResults(truth, predictions, decoder) {
       output.push({ truth_index: ti, prediction_index: null, outcome: "unsupported_format" });
       continue;
     }
-    const gtFmt = canonicalFormat(gt.format);
+    const gtFmt = formatFamily(gt.format);
     const gtText = normalizedPayload(gtFmt, gt.text);
     let exact = null;
     for (let pi = 0; pi < predictions.length; pi++) {
       if (used[pi]) continue;
-      const pf = canonicalFormat(predictions[pi].format);
+      const pf = formatFamily(predictions[pi].format);
       const pt = normalizedPayload(pf, predictions[pi].text);
       const upcEanBridge =
         new Set([pf, gtFmt]).size === 2 &&
@@ -211,7 +226,7 @@ export function matchResults(truth, predictions, decoder) {
     let sameFormat = null;
     for (let pi = 0; pi < predictions.length; pi++) {
       if (used[pi]) continue;
-      const pf = canonicalFormat(predictions[pi].format);
+      const pf = formatFamily(predictions[pi].format);
       if (sameText === null && payloadsEqual(gtFmt, normalizedPayload(pf, predictions[pi].text), gtText)) sameText = pi;
       if (sameFormat === null && pf === gtFmt) sameFormat = pi;
     }
@@ -335,7 +350,7 @@ export function generateSummary(records, { title } = {}) {
     title: title || "zxing-wasm vs. Dynamsoft Barcode Reader vs. Scandit — JavaScript/WASM",
     dataset: "BarBeR public dataset",
     disclosure:
-      "This benchmark compares three JavaScript/WASM barcode readers on the public third-party BarBeR dataset. Dynamsoft, the developer of Dynamsoft Barcode Reader, built and published this benchmark; Scandit and ZXing are third-party products evaluated with their standard, publicly documented settings. Scandit runs in BarcodeBatch (MatrixScan) mode over a single ImageFrameSource frame per image, with all BarBeR-relevant symbologies enabled; it has no JAPAN_POST or POSTNET symbology, so those annotations are scored as unsupported_format (no-read), the same treatment zxing-wasm gets for formats it does not support. Scandit reports EAN-13 and UPC-A as one combined symbology, which the harness splits by payload length; all Code 128 results are labeled CODE_128 rather than GS1_128 because BarBeR annotates 1,120 Code 128 barcodes as CODE_128 and only 4 as GS1_128 (the pre-correction records are retained for audit). To make the comparison auditable, the protocol, decoder configurations, environment details, dataset manifest, HTML report, and per-image raw results are provided. BarBeR's standardized annotations were generated with assistance from proprietary Datalogic software. Difficult undecodable barcode regions are excluded from decoding accuracy when no reliable payload is available. Every record here was re-scored with protocol v2, which maps the underscored BarBeR labels to the names the readers use, unwraps GS1 application identifiers printed in parentheses, and accepts a Royal Mail payload one character shorter than the annotation; no decoder was re-run for the re-score.",
+      "This benchmark compares three JavaScript/WASM barcode readers on the public third-party BarBeR dataset. Dynamsoft, the developer of Dynamsoft Barcode Reader, built and published this benchmark; Scandit and ZXing are third-party products evaluated with their standard, publicly documented settings. Scandit runs in BarcodeBatch (MatrixScan) mode over a single ImageFrameSource frame per image, with all BarBeR-relevant symbologies enabled; it has no JAPAN_POST or POSTNET symbology, so those annotations are scored as unsupported_format (no-read), the same treatment zxing-wasm gets for formats it does not support. Scandit reports EAN-13 and UPC-A as one combined symbology, which the harness splits by payload length; all Code 128 results are labeled CODE_128 rather than GS1_128 because BarBeR annotates 1,120 Code 128 barcodes as CODE_128 and only 4 as GS1_128 (the pre-correction records are retained for audit). To make the comparison auditable, the protocol, decoder configurations, environment details, dataset manifest, HTML report, and per-image raw results are provided. BarBeR's standardized annotations were generated with assistance from proprietary Datalogic software. Difficult undecodable barcode regions are excluded from decoding accuracy when no reliable payload is available. Every record here was re-scored with protocol v2, which maps the underscored BarBeR labels to the names the readers use, unwraps GS1 application identifiers printed in parentheses, accepts a Royal Mail payload one character shorter than the annotation, and matches Code 128 with GS1-128 as one format family (GS1-128 is Code 128 carrying GS1 data, not a separate symbology); no decoder was re-run for the re-score.",
     decoders,
   };
 }

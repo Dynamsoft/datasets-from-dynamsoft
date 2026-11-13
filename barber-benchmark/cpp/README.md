@@ -135,9 +135,9 @@ The full run uses one repetition on 7,894 unique BarBeR images in a single Ubunt
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader 11.6.50.29329 | 8,046 / 8,411 | 95.66% | 89 (1.06%) | 276 (3.28%) | 444.05 ms | 261.60 ms | 1422.82 ms |
-| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,604 / 8,411 | 90.41% | 245 (2.91%) | 562 (6.68%) | 105.73 ms | 89.78 ms | 229.06 ms |
-| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
+| Dynamsoft Barcode Reader 11.6.50.29329 | **8,050 / 8,411** | **95.71%** | 85 (1.01%) | **276 (3.28%)** | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,776 / 8,411 | 92.45% | **73 (0.87%)** | 562 (6.68%) | 105.73 ms | 89.78 ms | **229.06 ms** |
+| ZXing-C++ 3.1.1 | 6,035 / 8,411 | 71.75% | 96 (1.14%) | 2,280 (27.11%) | **70.90 ms** | **38.51 ms** | 265.90 ms |
 
 > **No precision column.** Precision would be correct predictions over all predictions, and its
 > denominator is the predictions rather than the annotations. On BarBeR that ratio is dominated by
@@ -146,7 +146,7 @@ The full run uses one repetition on 7,894 unique BarBeR images in a single Ubunt
 > Pharmacode One-Track on images BarBeR has no annotation for — is charged as a false positive. It
 > measures annotation coverage as much as decoder error, so it is not reported.
 
-Scandit read 1,573 more ground truth barcodes than ZXing-C++ and 442 fewer than DBR, a gap of 5.25 percentage points in recall against DBR and 18.71 points over ZXing-C++. The three separate almost entirely on no-reads (DBR 276, Scandit 562, ZXing-C++ 2,280); on wrong reads Scandit is the weakest of the three at 245, against DBR's 89 and ZXing-C++'s 100.
+Scandit read 1,741 more ground truth barcodes than ZXing-C++ and 274 fewer than DBR, a gap of 3.26 percentage points in recall behind DBR and 20.70 points ahead of ZXing-C++. It also produced the fewest wrong reads of the three (73, against DBR's 85 and ZXing-C++'s 96); what separates it from DBR is the no-read column, 562 against 276.
 
 Unsupported-format counts are DBR 0, Scandit 23, ZXing-C++ 227. Scandit's 23 are the JAPAN_POST (17) and POSTNET (6) annotations it has no symbology for; ZXing-C++ adds KIX, IATA_2_OF_5 and USPS Intelligent Mail to that. DBR supports every BarBeR symbology, so its whole no-read column is barcodes it did not return. Six DBR frames returned 'Operation timeout' and are counted as no-reads (`decoder_error`), never as wrong reads.
 
@@ -188,6 +188,7 @@ Protocol v2. v1 differed in three rules; every record in `results/full_linux/` w
 - CODE_128 / GS1-128 leading `{GS}`, `{FNC1}`, and ASCII GS markers are stripped before scoring
 - **v2:** GS1 application identifiers printed in parentheses are unwrapped before comparison, so a reader that returns `(90)85320` matches the annotation `9085320`. Scoped to CODE_128 / GS1_128
 - **v2:** a `ROYAL_MAIL` payload that is the annotation's prefix, one character shorter, counts as the same reading. The Linux DBR build returns 10 of the 11 characters; the trailing character is not reconstructible from the payload with the tables available here, so the rule is limited to this one symbology and to a single missing character
+- **v2:** `CODE_128` and `GS1_128` are one format family. GS1-128 is Code 128 carrying GS1 data — same bars, same code sets, same check character, with an FNC1 in the first data position as the only difference (AIM separates them as ]C0 / ]C1). The readers report that through three different channels: DBR prefixes the payload with `{GS}`, ZXing exposes the AIM identifier, Scandit sets a GS1 carrier flag. Scoring the name a vendor happens to use charged Scandit with 172 wrong formats and DBR / ZXing with 4 each; the family rule removes that asymmetry and payloads still have to match exactly
 - **v2:** the canonical format table maps the underscored BarBeR labels `ROYAL_MAIL`, `IATA_2_OF_5` and `USPS_INTELLIGENT_MAIL` to the spellings the decoders use. v1 stripped the underscores before lookup, so those names matched no decoders' supported set and 192 readable annotations were scored as unsupported by all three readers
 - HTML entities, trailing newlines, and a leading `\000001` escape are normalized before scoring
 - Ground truth payload `^` is treated as an unreliable placeholder and excluded from scoring

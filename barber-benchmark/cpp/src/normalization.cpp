@@ -70,6 +70,16 @@ std::string canonicalFormat(std::string_view value)
     return it == map.end() ? normalized : it->second;
 }
 
+std::string formatFamily(std::string_view value)
+{
+    // GS1-128 and Code 128 are the same symbology; see normalization.h. The
+    // readers report the GS1-ness through three different channels ({GS} prefix,
+    // AIM identifier, carrier flag), so matching must not depend on the name one
+    // of them happens to use.
+    const auto canonical = canonicalFormat(value);
+    return canonical == "GS1_128" ? "CODE_128" : canonical;
+}
+
 void replaceAll(std::string& value, std::string_view from, std::string_view to)
 {
     if (from.empty()) return;

@@ -65,6 +65,12 @@ turns itself off. All decoded barcodes in that frame come back in `addedTrackedB
   UPC-A/EAN-13 leading zeros, CODE_39 start/stop asterisks, CODE_128 GS1 markers, HTML entities,
   trailing newlines, and a leading `\000001` escape are normalized before scoring. Ground truth
   payload `^` is excluded, and DBR `CODE39EXTENDED` output is treated as `CODE_39`.
+- `CODE_128` and `GS1_128` are matched as one format family. GS1-128 is Code 128
+  carrying GS1 data — same bars, same code sets, same check character, with an FNC1 in the first data
+  position as the only difference (AIM separates them as `]C0` / `]C1`). DBR signals that with a
+  `{GS}` payload prefix, zxing with the AIM identifier, Scandit with a carrier flag; scoring the name
+  a vendor happens to use charged Scandit with 172 wrong formats on the Linux run and DBR / ZXing
+  with 4 each on both runs. Payloads still have to match exactly.
 - Two payload equivalences were added in v2. GS1 application identifiers printed in parentheses are
   unwrapped for `CODE_128` / `GS1_128`, so zxing-wasm's `(90)85320` matches the annotation
   `9085320`. A `ROYAL_MAIL` payload that is the annotation's prefix one character shorter counts as
@@ -200,9 +206,9 @@ to 8,411 for all three decoders.
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean decode | Median decode | P95 decode |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Dynamsoft Barcode Reader JS 11.6.5000 | **7,638 / 8,411** | **90.81%** | 90 (1.07%) | 683 (8.12%) | 157.88 ms | 125.75 ms | 380.20 ms |
-| Scandit Data Capture SDK 8.7.1 | 7,589 / 8,411 | 90.23% | **85 (1.01%)** | 737 (8.76%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
-| zxing-wasm 3.1.2 | 6,019 / 8,411 | 71.56% | 94 (1.12%) | 2,298 (27.32%) | 144.54 ms | 88.20 ms | 476.00 ms |
+| Dynamsoft Barcode Reader JS 11.6.5000 | **7,642 / 8,411** | **90.86%** | 86 (1.02%) | 683 (8.12%) | 157.88 ms | 125.75 ms | 380.20 ms |
+| Scandit Data Capture SDK 8.7.1 | 7,593 / 8,411 | 90.27% | **81 (0.96%)** | 737 (8.76%) | **92.42 ms** | **76.80 ms** | **202.60 ms** |
+| zxing-wasm 3.1.2 | 6,023 / 8,411 | 71.61% | 90 (1.07%) | 2,298 (27.32%) | 144.54 ms | 88.20 ms | 476.00 ms |
 
 Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`), so correct + wrong reads + no read equals the 8,411 scored ground-truth instances. A prediction that no annotation claims is not a fourth outcome — the harness cannot tell an unannotated barcode from a hallucination on BarBeR — so it is set aside rather than charged to an instance. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
 
@@ -212,9 +218,9 @@ Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no r
 > photograph, or a symbology the dataset does not cover, is charged as a false positive. It measures
 > annotation coverage as much as decoder error, so it is not reported.
 
-DBR read 49 more ground truth barcodes than Scandit, a lead of 0.58 percentage points in recall.
-Scandit read 1,570 more than zxing-wasm, a lead of 18.67 points in recall, and produced the fewest
-wrong reads (85 against DBR's 90 and zxing-wasm's 94). Scandit was the fastest decoder on every
+DBR read 49 more ground truth barcodes than Scandit, a lead of 0.59 percentage points in recall.
+Scandit read 1,570 more than zxing-wasm, a lead of 18.66 points in recall, and produced the fewest
+wrong reads (81 against DBR's 86 and zxing-wasm's 90). Scandit was the fastest decoder on every
 timing measure: 92.42 ms mean (versus 157.88 ms DBR and 144.54 ms zxing-wasm), 76.80 ms median and
 202.60 ms P95, both the lowest of the three. DBR's lead over Scandit comes from the no-read column —
 683 against 737 — and Scandit's 23 unsupported annotations are the only ones either decoder cannot
@@ -222,10 +228,10 @@ attempt. Five images could not be decoded by the browser at all and are counted 
 (`decoder_error` in `outcomes`) for all three decoders; `validate_results.mjs` reports these 15
 records as errors by design.
 
-The DBR accuracy numbers are identical to the original two-decoder run (7,638 correct), confirming
-that adding Scandit did not change the matching rules. zxing-wasm gains 61 correct readings under
-protocol v2 (5,958 → 6,019) from the GS1 parenthesis rule; only the decode times differ from the
-earlier run, because this one used headless Chrome on different hardware.
+Against the original two-decoder run, DBR gains 4 correct readings under protocol v2 (7,638 →
+7,642, from the GS1 format family) and zxing-wasm gains 65 (5,958 → 6,023: 61 from the GS1
+parenthesis rule and 4 from the same family rule). Only the decode times differ from the earlier run,
+because this one used headless Chrome on different hardware.
 
 ### Post-run correction (auditable)
 

@@ -102,12 +102,12 @@ Full details: [`js/README.md`](./js/README.md) and [`js/report/index.html`](./js
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean | Median | P95 |
 |:--------|--------:|-------:|------------:|--------:|-----:|-------:|----:|
-| Dynamsoft Barcode Reader JS 11.6.5000 | **7,638 / 8,411** | **90.81%** | 90 | 683 | 157.88 ms | 125.75 ms | 380.20 ms |
-| Scandit Data Capture SDK 8.7.1 (Web) | 7,589 / 8,411 | 90.23% | **85** | 737 | **92.42 ms** | **76.80 ms** | **202.60 ms** |
-| zxing-wasm 3.1.2 | 6,019 / 8,411 | 71.56% | 94 | 2,298 | 144.54 ms | 88.20 ms | 476.00 ms |
+| Dynamsoft Barcode Reader JS 11.6.5000 | **7,642 / 8,411** | **90.86%** | 86 | 683 | 157.88 ms | 125.75 ms | 380.20 ms |
+| Scandit Data Capture SDK 8.7.1 (Web) | 7,593 / 8,411 | 90.27% | **81** | 737 | **92.42 ms** | **76.80 ms** | **202.60 ms** |
+| zxing-wasm 3.1.2 | 6,023 / 8,411 | 71.61% | 90 | 2,298 | 144.54 ms | 88.20 ms | 476.00 ms |
 
-Scandit read 49 fewer ground-truth barcodes than DBR (‑0.58 points of recall) and 1,570 more than
-zxing‑wasm (+18.67 points). It was fastest on every timing measure and produced the fewest wrong
+Scandit read 49 fewer ground-truth barcodes than DBR (‑0.59 points of recall) and 1,570 more than
+zxing‑wasm (+18.66 points). It was fastest on every timing measure and produced the fewest wrong
 reads.
 
 > **Post-run correction (auditable):** the first Web pass labeled Scandit Code 128 results carrying
@@ -126,16 +126,16 @@ Ubuntu 24.04 linux/amd64 container, 4 worker processes on disjoint manifest slic
 
 | Decoder | Correct | Recall | Wrong reads | No read | Mean | Median | P95 |
 |:--------|--------:|-------:|------------:|--------:|-----:|-------:|----:|
-| Dynamsoft Barcode Reader 11.6.50.29329 (Linux) | **8,046 / 8,411** | **95.66%** | **89** | **276** | 444.05 ms | 261.60 ms | 1422.82 ms |
-| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,604 / 8,411 | 90.41% | 245 | 562 | 105.73 ms | 89.78 ms | **229.06 ms** |
-| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 100 | 2,280 | **70.90 ms** | **38.51 ms** | 265.90 ms |
+| Dynamsoft Barcode Reader 11.6.50.29329 (Linux) | **8,050 / 8,411** | **95.71%** | 85 | **276** | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,776 / 8,411 | 92.45% | **73** | 562 | 105.73 ms | 89.78 ms | **229.06 ms** |
+| ZXing-C++ 3.1.1 | 6,035 / 8,411 | 71.75% | 96 | 2,280 | **70.90 ms** | **38.51 ms** | 265.90 ms |
 
-Scandit read 442 fewer barcodes than DBR (‑5.25 points of recall) and 1,573 more than ZXing-C++
-(+18.71 points). The gap to DBR comes from the no-read column rather than from misreads: Scandit
-leaves 562 annotations unread against DBR's 276, and it also reads 156 more of them wrongly (245
-against 89). Unsupported formats account for Scandit 23 (it has no JAPAN_POST / POSTNET symbology)
-and ZXing-C++ 227; DBR supports every BarBeR symbology, so its whole no-read column is barcodes it
-did not return. Six DBR frames returned "Operation timeout" and are counted as no-reads.
+Scandit read 274 fewer barcodes than DBR (‑3.26 points of recall) and 1,741 more than ZXing-C++
+(+20.70 points). It also produced the fewest wrong reads of the three (73 against DBR's 85 and
+ZXing-C++'s 96); the gap to DBR is the no-read column, 562 against 276. Unsupported formats account
+for Scandit 23 (it has no JAPAN_POST / POSTNET symbology) and ZXing-C++ 227; DBR supports every
+BarBeR symbology, so its whole no-read column is barcodes it did not return. Six DBR frames returned
+"Operation timeout" and are counted as no-reads.
 
 > **Timing caveat:** four worker processes shared 16 logical processors, so absolute decode times
 > include CPU contention. The Linux DCV build also runs the official preset template with
@@ -167,26 +167,34 @@ from the same predictions with `rematch` and now carries `"protocol": "protocol-
    Code 128, which recovers 61 readings.
 3. **Royal Mail payload length.** The Linux DBR build returns 10 of the 11 characters the annotation
    holds. A one-character prefix now counts as the same reading, for that symbology only.
+4. **Code 128 and GS1-128 are one format family.** GS1-128 is Code 128 carrying GS1 data: same bars,
+   same code sets, same check character, with an FNC1 in the first data position as the only
+   difference (AIM separates them as `]C0` / `]C1`). The readers report that fact through three
+   different channels — DBR prefixes the payload with `{GS}`, zxing exposes the AIM identifier,
+   Scandit sets a carrier flag — so scoring the name a vendor happens to use penalised Scandit with
+   172 wrong formats on Linux while paying DBR and ZXing the same grace through a different channel.
+   Payloads still have to match exactly.
 
 | Run | Decoder | v1 | v2 | Δ |
 |:----|:--------|:---|---:|---:|
-| Web | Dynamsoft Barcode Reader JS | 7,638 · 90.81% | 7,638 · 90.81% | — |
-| Web | Scandit Data Capture SDK | 7,454 · 88.62% | 7,589 · 90.23% | +135 · +1.61 |
-| Web | zxing-wasm | 5,958 · 70.84% | 6,019 · 71.56% | +61 · +0.72 |
-| Linux | Dynamsoft Barcode Reader | 7,863 · 93.48% | 8,046 · 95.66% | +183 · +2.18 |
-| Linux | Scandit Barcode Scanner SDK | 7,467 · 88.78% | 7,604 · 90.41% | +137 · +1.63 |
-| Linux | ZXing-C++ | 6,031 · 71.70% | 6,031 · 71.70% | — |
+| Web | Dynamsoft Barcode Reader JS | 7,638 · 90.81% | 7,642 · 90.86% | +4 · +0.05 |
+| Web | Scandit Data Capture SDK | 7,454 · 88.62% | 7,593 · 90.27% | +139 · +1.65 |
+| Web | zxing-wasm | 5,958 · 70.84% | 6,023 · 71.61% | +65 · +0.77 |
+| Linux | Dynamsoft Barcode Reader | 7,863 · 93.48% | 8,050 · 95.71% | +187 · +2.23 |
+| Linux | Scandit Barcode Scanner SDK | 7,467 · 88.78% | 7,776 · 92.45% | +309 · +3.67 |
+| Linux | ZXing-C++ | 6,031 · 71.70% | 6,035 · 71.75% | +4 · +0.05 |
 
-The ranking is unchanged in both runtimes. The Linux DBR gain is larger than the Web DBR gain because
+The ranking is unchanged in both runtimes. Scandit gains the most because it is the only reader that
+names the GS1 convention separately, and the Linux DBR gain is larger than the Web DBR gain because
 only the native build decodes Royal Mail at all.
 
 ## Cross-runtime observations
 
-- **Scandit is remarkably consistent**: 90.23% recall on Web vs 90.41% on Linux, despite entirely
+- **Scandit is remarkably consistent**: 90.27% recall on Web vs 92.45% on Linux, despite entirely
   different SDKs (Web WASM / Linux C API), engines and symbology configurations.
-- **ZXing is likewise close**: 71.56% (zxing-wasm 3.1.2) vs 71.70% (ZXing-C++ 3.1.1), as expected
+- **ZXing is likewise close**: 71.61% (zxing-wasm 3.1.2) vs 71.75% (ZXing-C++ 3.1.1), as expected
   from the same underlying C++ core.
-- **DBR differs most**: 90.81% on Web vs 95.66% on Linux. The Linux build runs the deep-learning
+- **DBR differs most**: 90.86% on Web vs 95.71% on Linux. The Linux build runs the deep-learning
   model preset template and detects more aggressively — it resolves 408 more of the 8,411
   annotations and leaves 407 fewer unread — and 183 of that gain is Royal Mail, which only the
   native build decodes. Those are two different product builds, not the same decoder in two
@@ -206,8 +214,9 @@ Both harnesses follow the same protocol-v2 rules (the companion Python benchmark
 - Predictions and ground truth are matched one-to-one as multisets on canonical format plus exact
   normalized payload. UPC-A/EAN-13 leading zeros, Code 39 asterisks, Code 128 GS1 markers, GS1
   application identifiers in parentheses, a one-character Royal Mail prefix, HTML entities,
-  trailing newlines and a leading `\000001` escape are normalized. The `^` placeholder is excluded
-  and barcode location is not scored.
+  trailing newlines and a leading `\000001` escape are normalized. Code 128 and GS1-128 are one
+  format family, because GS1-128 is Code 128 carrying GS1 data rather than a separate symbology.
+  The `^` placeholder is excluded and barcode location is not scored.
 - Every annotation resolves to exactly one outcome: **correct**, **wrong read**
   (`wrong_text + wrong_format`) or **no read** (`not_found + unsupported_format + decoder_error`),
   and the three sum to the 8,411 scored annotations. A prediction that no annotation claims is

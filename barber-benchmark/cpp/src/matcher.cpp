@@ -26,8 +26,8 @@ bool payloadsEqual(std::string_view format, std::string_view a, std::string_view
 
 bool equivalentFormatAndPayload(const GroundTruth& gt, const DecodedBarcode& prediction)
 {
-    const auto gf = canonicalFormat(gt.format);
-    const auto pf = canonicalFormat(prediction.canonical_format);
+    const auto gf = formatFamily(gt.format);
+    const auto pf = formatFamily(prediction.canonical_format);
     if (gf == pf) return payloadsEqual(gf, normalizedPayload(gf, gt.text), normalizedPayload(gf, prediction.text));
     if ((gf == "UPC_A" && pf == "EAN_13") || (gf == "EAN_13" && pf == "UPC_A"))
         return normalizedPayload("UPC_A", gt.text) == normalizedPayload("UPC_A", prediction.text);
@@ -67,7 +67,7 @@ std::vector<MatchItem> matchResults(const std::vector<GroundTruth>& truth,
             output.push_back({ti, std::nullopt, Outcome::UnsupportedFormat});
             continue;
         }
-        const auto gt_format = canonicalFormat(gt.format);
+        const auto gt_format = formatFamily(gt.format);
         const auto gt_text = normalizedPayload(gt_format, gt.text);
         std::optional<std::size_t> exact;
         for (std::size_t pi = 0; pi < predictions.size(); ++pi) {
@@ -86,7 +86,7 @@ std::vector<MatchItem> matchResults(const std::vector<GroundTruth>& truth,
         std::optional<std::size_t> same_format;
         for (std::size_t pi = 0; pi < predictions.size(); ++pi) {
             if (used[pi]) continue;
-            const auto pf = canonicalFormat(predictions[pi].canonical_format);
+            const auto pf = formatFamily(predictions[pi].canonical_format);
             if (!same_text && payloadsEqual(gt_format, normalizedPayload(pf, predictions[pi].text), gt_text)) same_text = pi;
             if (!same_format && pf == gt_format) same_format = pi;
         }
