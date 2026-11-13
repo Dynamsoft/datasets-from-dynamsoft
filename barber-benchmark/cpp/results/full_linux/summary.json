@@ -1,0 +1,525 @@
+{
+  "dataset": "BarBeR public dataset",
+  "decoders": {
+    "dynamsoft-dbr": {
+      "by_format": {
+        "AZTEC": {
+          "correct": 14,
+          "not_found": 2,
+          "wrong_text": 10
+        },
+        "CODE_128": {
+          "correct": 1085,
+          "not_found": 22,
+          "wrong_text": 13
+        },
+        "CODE_39": {
+          "correct": 182,
+          "not_found": 14,
+          "wrong_text": 2
+        },
+        "DATA_MATRIX": {
+          "correct": 105,
+          "not_found": 3,
+          "wrong_text": 2
+        },
+        "EAN_13": {
+          "correct": 4789,
+          "decoder_error": 4,
+          "not_found": 56,
+          "wrong_text": 8
+        },
+        "EAN_8": {
+          "correct": 68
+        },
+        "GS1_128": {
+          "wrong_format": 4
+        },
+        "IATA_2_OF_5": {
+          "not_found": 3
+        },
+        "ITF": {
+          "correct": 67,
+          "not_found": 3,
+          "wrong_text": 1
+        },
+        "JAPAN_POST": {
+          "not_found": 17
+        },
+        "KIX": {
+          "not_found": 7,
+          "wrong_text": 1
+        },
+        "PDF_417": {
+          "correct": 55,
+          "not_found": 7,
+          "wrong_text": 25
+        },
+        "POSTNET": {
+          "correct": 2,
+          "not_found": 3,
+          "wrong_text": 1
+        },
+        "QR_CODE": {
+          "correct": 1179,
+          "decoder_error": 2,
+          "not_found": 121,
+          "wrong_text": 22
+        },
+        "ROYAL_MAIL": {
+          "unsupported_format": 192
+        },
+        "UPC_A": {
+          "correct": 317,
+          "not_found": 2
+        },
+        "USPS_INTELLIGENT_MAIL": {
+          "not_found": 1
+        }
+      },
+      "by_source": {
+        "Artelab Extended.json": {
+          "correct": 134
+        },
+        "Artelab.json": {
+          "correct": 420,
+          "not_found": 2,
+          "wrong_text": 1
+        },
+        "Bodnar.json": {
+          "correct": 93,
+          "not_found": 1
+        },
+        "Deal Kaist.json": {
+          "correct": 2837,
+          "decoder_error": 3,
+          "not_found": 46,
+          "wrong_text": 4
+        },
+        "Dubska.json": {
+          "correct": 704,
+          "decoder_error": 2,
+          "not_found": 95
+        },
+        "InventBar.json": {
+          "correct": 517,
+          "not_found": 13
+        },
+        "Muenster.json": {
+          "correct": 1055,
+          "not_found": 6
+        },
+        "Open Food Facts.json": {
+          "correct": 145,
+          "not_found": 4
+        },
+        "ParcelBar.json": {
+          "correct": 803,
+          "not_found": 23,
+          "wrong_text": 10
+        },
+        "SKUU DSP Lab.json": {
+          "correct": 266,
+          "not_found": 9,
+          "wrong_text": 2
+        },
+        "Szentandrasi-Dubska QR.json": {
+          "correct": 202,
+          "not_found": 13,
+          "wrong_text": 10
+        },
+        "ZVZ-real.json": {
+          "correct": 687,
+          "decoder_error": 1,
+          "not_found": 49,
+          "unsupported_format": 192,
+          "wrong_format": 4,
+          "wrong_text": 58
+        }
+      },
+      "common_format_correct": 7861,
+      "common_format_eligible": 8184,
+      "common_format_recall": 0.9605327468230694,
+      "common_format_recall_ci95": [
+        0.9560938159480522,
+        0.964539544860293
+      ],
+      "correct": 7863,
+      "coverage_adjusted_recall": 0.934847223873499,
+      "coverage_adjusted_recall_ci95": [
+        0.9293719262645528,
+        0.9399254973169922
+      ],
+      "eligible_instances": 8411,
+      "errors": 6,
+      "f1": 0.8949465058046893,
+      "image_all_read_rate": 0.9337471497339752,
+      "mean_decode_ms": 444.0451519646567,
+      "median_decode_ms": 261.601014,
+      "no_read": 459,
+      "outcomes": {
+        "correct": 7863,
+        "decoder_error": 6,
+        "extra_result": 1209,
+        "not_found": 261,
+        "unsupported_format": 192,
+        "wrong_format": 4,
+        "wrong_text": 85
+      },
+      "p90_decode_ms": 872.835051,
+      "p95_decode_ms": 1422.822846,
+      "p99_decode_ms": 3508.531085,
+      "precision": 0.8583124113088091,
+      "records": 7894,
+      "supported_format_recall": 0.9566857281907775,
+      "total_decode_ms": 3505292.429609,
+      "unsupported": 192,
+      "wrong_reads": 89
+    },
+    "scandit-linux": {
+      "by_format": {
+        "AZTEC": {
+          "correct": 13,
+          "not_found": 1,
+          "wrong_text": 12
+        },
+        "CODE_128": {
+          "correct": 926,
+          "not_found": 14,
+          "wrong_format": 172,
+          "wrong_text": 8
+        },
+        "CODE_39": {
+          "correct": 182,
+          "not_found": 14,
+          "wrong_text": 2
+        },
+        "DATA_MATRIX": {
+          "correct": 102,
+          "not_found": 6,
+          "wrong_text": 2
+        },
+        "EAN_13": {
+          "correct": 4659,
+          "not_found": 195,
+          "wrong_text": 3
+        },
+        "EAN_8": {
+          "correct": 57,
+          "not_found": 11
+        },
+        "GS1_128": {
+          "correct": 4
+        },
+        "IATA_2_OF_5": {
+          "not_found": 3
+        },
+        "ITF": {
+          "correct": 63,
+          "not_found": 7,
+          "wrong_text": 1
+        },
+        "JAPAN_POST": {
+          "unsupported_format": 17
+        },
+        "KIX": {
+          "not_found": 7,
+          "wrong_format": 1
+        },
+        "PDF_417": {
+          "correct": 46,
+          "not_found": 13,
+          "wrong_text": 28
+        },
+        "POSTNET": {
+          "unsupported_format": 6
+        },
+        "QR_CODE": {
+          "correct": 1106,
+          "not_found": 202,
+          "wrong_text": 16
+        },
+        "ROYAL_MAIL": {
+          "unsupported_format": 192
+        },
+        "UPC_A": {
+          "correct": 309,
+          "not_found": 10
+        },
+        "USPS_INTELLIGENT_MAIL": {
+          "not_found": 1
+        }
+      },
+      "by_source": {
+        "Artelab Extended.json": {
+          "correct": 131,
+          "not_found": 2,
+          "wrong_text": 1
+        },
+        "Artelab.json": {
+          "correct": 416,
+          "not_found": 7
+        },
+        "Bodnar.json": {
+          "correct": 87,
+          "not_found": 7
+        },
+        "Deal Kaist.json": {
+          "correct": 2724,
+          "not_found": 164,
+          "wrong_text": 2
+        },
+        "Dubska.json": {
+          "correct": 673,
+          "not_found": 128
+        },
+        "InventBar.json": {
+          "correct": 337,
+          "not_found": 22,
+          "wrong_format": 171
+        },
+        "Muenster.json": {
+          "correct": 1028,
+          "not_found": 32,
+          "wrong_text": 1
+        },
+        "Open Food Facts.json": {
+          "correct": 138,
+          "not_found": 11
+        },
+        "ParcelBar.json": {
+          "correct": 820,
+          "not_found": 12,
+          "wrong_text": 4
+        },
+        "SKUU DSP Lab.json": {
+          "correct": 261,
+          "not_found": 16
+        },
+        "Szentandrasi-Dubska QR.json": {
+          "correct": 184,
+          "not_found": 31,
+          "wrong_text": 10
+        },
+        "ZVZ-real.json": {
+          "correct": 668,
+          "not_found": 52,
+          "unsupported_format": 215,
+          "wrong_format": 2,
+          "wrong_text": 54
+        }
+      },
+      "common_format_correct": 7467,
+      "common_format_eligible": 8184,
+      "common_format_recall": 0.9123900293255132,
+      "common_format_recall_ci95": [
+        0.9060695614826703,
+        0.9183235382064158
+      ],
+      "correct": 7467,
+      "coverage_adjusted_recall": 0.8877660206871953,
+      "coverage_adjusted_recall_ci95": [
+        0.8808423838581224,
+        0.8943356194258719
+      ],
+      "eligible_instances": 8411,
+      "errors": 0,
+      "f1": 0.8933955491744435,
+      "image_all_read_rate": 0.884849252596909,
+      "mean_decode_ms": 105.732751442868,
+      "median_decode_ms": 89.777927,
+      "no_read": 699,
+      "outcomes": {
+        "correct": 7467,
+        "extra_result": 593,
+        "not_found": 484,
+        "unsupported_format": 215,
+        "wrong_format": 173,
+        "wrong_text": 72
+      },
+      "p90_decode_ms": 183.922016,
+      "p95_decode_ms": 229.063908,
+      "p99_decode_ms": 337.811534,
+      "precision": 0.8990969295605057,
+      "records": 7894,
+      "supported_format_recall": 0.9110541727672035,
+      "total_decode_ms": 834654.33989,
+      "unsupported": 215,
+      "wrong_reads": 245
+    },
+    "zxing-cpp": {
+      "by_format": {
+        "AZTEC": {
+          "correct": 11,
+          "not_found": 5,
+          "wrong_text": 10
+        },
+        "CODE_128": {
+          "correct": 422,
+          "not_found": 675,
+          "wrong_format": 5,
+          "wrong_text": 18
+        },
+        "CODE_39": {
+          "correct": 150,
+          "not_found": 46,
+          "wrong_text": 2
+        },
+        "DATA_MATRIX": {
+          "correct": 98,
+          "not_found": 10,
+          "wrong_text": 2
+        },
+        "EAN_13": {
+          "correct": 3815,
+          "not_found": 1024,
+          "wrong_text": 18
+        },
+        "EAN_8": {
+          "correct": 62,
+          "not_found": 6
+        },
+        "GS1_128": {
+          "wrong_format": 4
+        },
+        "IATA_2_OF_5": {
+          "unsupported_format": 3
+        },
+        "ITF": {
+          "correct": 58,
+          "not_found": 12,
+          "wrong_text": 1
+        },
+        "JAPAN_POST": {
+          "unsupported_format": 17
+        },
+        "KIX": {
+          "unsupported_format": 8
+        },
+        "PDF_417": {
+          "correct": 32,
+          "not_found": 35,
+          "wrong_text": 20
+        },
+        "POSTNET": {
+          "unsupported_format": 6
+        },
+        "QR_CODE": {
+          "correct": 1126,
+          "not_found": 178,
+          "wrong_text": 20
+        },
+        "ROYAL_MAIL": {
+          "unsupported_format": 192
+        },
+        "UPC_A": {
+          "correct": 257,
+          "not_found": 62
+        },
+        "USPS_INTELLIGENT_MAIL": {
+          "unsupported_format": 1
+        }
+      },
+      "by_source": {
+        "Artelab Extended.json": {
+          "correct": 99,
+          "not_found": 34,
+          "wrong_text": 1
+        },
+        "Artelab.json": {
+          "correct": 231,
+          "not_found": 191,
+          "wrong_text": 1
+        },
+        "Bodnar.json": {
+          "correct": 86,
+          "not_found": 8
+        },
+        "Deal Kaist.json": {
+          "correct": 2256,
+          "not_found": 620,
+          "wrong_text": 14
+        },
+        "Dubska.json": {
+          "correct": 697,
+          "not_found": 104
+        },
+        "InventBar.json": {
+          "correct": 441,
+          "not_found": 89
+        },
+        "Muenster.json": {
+          "correct": 938,
+          "not_found": 122,
+          "wrong_text": 1
+        },
+        "Open Food Facts.json": {
+          "correct": 110,
+          "not_found": 39
+        },
+        "ParcelBar.json": {
+          "correct": 213,
+          "not_found": 608,
+          "wrong_format": 5,
+          "wrong_text": 10
+        },
+        "SKUU DSP Lab.json": {
+          "correct": 198,
+          "not_found": 78,
+          "wrong_text": 1
+        },
+        "Szentandrasi-Dubska QR.json": {
+          "correct": 182,
+          "not_found": 29,
+          "wrong_text": 14
+        },
+        "ZVZ-real.json": {
+          "correct": 580,
+          "not_found": 131,
+          "unsupported_format": 227,
+          "wrong_format": 4,
+          "wrong_text": 49
+        }
+      },
+      "common_format_correct": 6031,
+      "common_format_eligible": 8184,
+      "common_format_recall": 0.7369257086999023,
+      "common_format_recall_ci95": [
+        0.7272768450978154,
+        0.7463522572124476
+      ],
+      "correct": 6031,
+      "coverage_adjusted_recall": 0.7170372131732256,
+      "coverage_adjusted_recall_ci95": [
+        0.7073135123423604,
+        0.7265627547111217
+      ],
+      "eligible_instances": 8411,
+      "errors": 0,
+      "f1": 0.8201536683212075,
+      "image_all_read_rate": 0.7159868254370408,
+      "mean_decode_ms": 70.90480907271345,
+      "median_decode_ms": 38.506359,
+      "no_read": 2280,
+      "outcomes": {
+        "correct": 6031,
+        "extra_result": 165,
+        "not_found": 2053,
+        "unsupported_format": 227,
+        "wrong_format": 9,
+        "wrong_text": 91
+      },
+      "p90_decode_ms": 151.351321,
+      "p95_decode_ms": 265.904015,
+      "p99_decode_ms": 464.24647,
+      "precision": 0.9579097839898348,
+      "records": 7894,
+      "supported_format_recall": 0.7369257086999023,
+      "total_decode_ms": 559722.56282,
+      "unsupported": 227,
+      "wrong_reads": 100
+    }
+  },
+  "disclosure": "This benchmark was implemented and published by Dynamsoft, the developer of Dynamsoft Barcode Reader. It uses the public third-party BarBeR dataset. To make the comparison auditable, the protocol, source code, decoder configurations, environment details, dataset manifest, HTML report, and per-image raw results are provided. BarBeR's standardized annotations were generated with assistance from proprietary Datalogic software. Difficult undecodable barcode regions were manually localized and are excluded from decoding accuracy when no reliable payload is available. All readers receive the same RGB888 pixel buffer loaded once per image; only the decoder call is timed. Scandit is exercised through its Linux C API (8.7.1) with SC_PRESET_HIGH_EFFORT, a fresh frame sequence per still image, duplicate filtering off, full-image search with no direction assumption, light-on-dark decoding enabled, multi-scan enabled, and every BarBeR symbology the SDK exposes enabled. Multi-scan is requested when the trial license includes the tracking feature; otherwise the SDK falls back to single-code scanning, which is disclosed in the run output. Scandit 8.7.1 exposes no JAPAN_POST or POSTNET symbology, so those ground truth instances are scored as unsupported_format. The ROYAL_MAIL ground truth label is not in the canonical format table and is scored as unsupported_format for all three readers, matching the pre-existing protocol. Scandit trial licenses require network access; license or activation failures are reported as decoder errors, never as no-reads. Accuracy and timing were collected in one Linux container with four worker processes handling disjoint manifest slices, so absolute decode times include CPU contention and must not be compared with single-process measurements on other platforms; only the relative ordering within this run is meaningful. Six Dynamsoft frames returned 'Operation timeout' under this contention and are recorded as decoder_error. The Linux DCV build runs its official preset template with deep-learning models and is not the same binary as the earlier Windows measurement.",
+  "title": "ZXing-C++ vs. Dynamsoft Barcode Reader vs. Scandit Barcode Scanner SDK (Linux)"
+}

@@ -1,0 +1,21 @@
+# Build outputs, caches and non-redistributable SDK trees.
+build-*/
+build/
+build-linux/
+.playwright-cli/
+output/
+__pycache__/
+*.pyc
+audit.log
+third_party/
+zxing-cpp/
+scandit-license-key.txt
+license-key.txt
+
+# Scratch results from smoke / experimental runs.
+results/smoke*/
+results/full_no_o2/
+results/full_partial_o2/
+
+# NOTE: manifests/, results/full_linux/ and report/ are intentionally INCLUDED in
+# this dataset repository — they are the published, auditable benchmark data.

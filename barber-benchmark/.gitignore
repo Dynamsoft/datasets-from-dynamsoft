@@ -1,0 +1,22 @@
+# User-supplied commercial license keys — never commit a filled key.
+licenses/dynamsoft-dbr.txt
+licenses/scandit-web.txt
+licenses/scandit-linux.txt
+cpp/scandit-license-key.txt
+cpp/license-key.txt
+license-key.txt
+
+# Proprietary / generated SDK trees (not redistributable)
+dcv/
+cpp/third_party/
+cpp/zxing-cpp/
+cpp/build/
+cpp/build-*/
+cpp/build-linux/
+js/node_modules/
+
+# Scratch runs and caches
+js/results/smoke*/
+cpp/results/smoke*/
+*.pyc
+__pycache__/

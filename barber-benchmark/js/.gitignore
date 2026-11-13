@@ -1,0 +1,3 @@
+node_modules/
+# User-supplied trial keys live one level up in ../licenses/ and are excluded there.
+results/smoke*/

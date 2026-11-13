@@ -1,0 +1,7 @@
+runtime,decoder,product,records,images,scored_ground_truth,correct,recall_pct,precision_pct,wrong_reads,no_read,extra_result,unsupported_format,mean_decode_ms,median_decode_ms,p95_decode_ms
+web,dynamsoft-dbr-js,Dynamsoft Barcode Reader JS 11.6.5000,7894,7894,8411,7638,90.81,95.97,90,683,231,196,157.88,125.75,380.2
+web,scandit-web-datacapture,Scandit Data Capture SDK 8.7.1 (Web),7894,7894,8411,7454,88.62,94.64,85,872,337,219,92.42,76.8,202.6
+web,zxing-wasm,zxing-wasm 3.1.2,7894,7894,8411,5958,70.84,94.96,154,2299,162,227,144.54,88.2,476
+cpp,dynamsoft-dbr,Dynamsoft Barcode Reader 11.6.50.29329 (Linux),7894,7894,8411,7863,93.48,85.83,89,459,1209,192,444.05,261.6,1422.82
+cpp,scandit-linux,Scandit Barcode Scanner SDK 8.7.1 (Linux),7894,7894,8411,7467,88.78,89.91,245,699,593,215,105.73,89.78,229.06
+cpp,zxing-cpp,ZXing-C++ 3.1.1,7894,7894,8411,6031,71.7,95.79,100,2280,165,227,70.9,38.51,265.9

@@ -1,0 +1,55 @@
+{
+  "leading_zero_only_mismatches_after_existing_upc_ean_normalization": {},
+  "code39_extended_alias_correct_matches": {},
+  "unreliable_placeholder_ground_truth": {
+    "dynamsoft-dbr": 204,
+    "zxing-cpp": 204,
+    "scandit-linux": 204
+  },
+  "top_wrong_pairs": {
+    "zxing-cpp": {
+      "wrong_text:PDF_417->PDF_417": 20,
+      "wrong_text:QR_CODE->QR_CODE": 20,
+      "wrong_text:EAN_13->EAN_13": 18,
+      "wrong_text:CODE_128->CODE_128": 18,
+      "wrong_text:AZTEC->AZTEC": 10,
+      "wrong_format:CODE_128->QR_CODE": 5,
+      "wrong_format:GS1_128->CODE_128": 4,
+      "wrong_text:CODE_39->CODE_39": 2,
+      "wrong_text:DATA_MATRIX->DATA_MATRIX": 2,
+      "wrong_text:ITF->ITF": 1
+    },
+    "scandit-linux": {
+      "wrong_format:CODE_128->GS1_128": 172,
+      "wrong_text:PDF_417->PDF_417": 28,
+      "wrong_text:QR_CODE->QR_CODE": 16,
+      "wrong_text:AZTEC->AZTEC": 12,
+      "wrong_text:CODE_128->CODE_128": 8,
+      "wrong_text:EAN_13->EAN_13": 3,
+      "wrong_text:DATA_MATRIX->DATA_MATRIX": 2,
+      "wrong_text:CODE_39->CODE_39": 2,
+      "wrong_text:ITF->ITF": 1,
+      "wrong_format:KIX->ROYAL_MAIL": 1
+    },
+    "dynamsoft-dbr": {
+      "wrong_text:PDF_417->PDF_417": 25,
+      "wrong_text:QR_CODE->QR_CODE": 22,
+      "wrong_text:CODE_128->CODE_128": 13,
+      "wrong_text:AZTEC->AZTEC": 10,
+      "wrong_text:EAN_13->EAN_13": 8,
+      "wrong_format:GS1_128->CODE_128": 4,
+      "wrong_text:DATA_MATRIX->DATA_MATRIX": 2,
+      "wrong_text:CODE_39->CODE_39": 2,
+      "wrong_text:POSTNET->POSTNET": 1,
+      "wrong_text:ITF->ITF": 1
+    }
+  },
+  "notes": [
+    "UPC-A already normalizes a leading zero when compared with EAN-13",
+    "CODE_39 start/stop asterisks are stripped before scoring",
+    "CODE_128/GS1_128 leading {GS}, {FNC1}, and ASCII GS markers are stripped before scoring",
+    "HTML entities, trailing newlines, and a leading \\000001 escape are normalized before scoring",
+    "Ground truth payload ^ is excluded from scoring as an unreliable placeholder",
+    "CODE39EXTENDED is treated as CODE_39 by the canonical format normalizer"
+  ]
+}

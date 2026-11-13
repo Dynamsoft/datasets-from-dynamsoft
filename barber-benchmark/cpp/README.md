@@ -1,0 +1,204 @@
+# C++ Barcode Reader Benchmark
+
+This project measures barcode decoding accuracy and speed for **ZXing-C++**, **Dynamsoft Barcode Reader** and the **Scandit Barcode Scanner SDK for Linux** on the public [BarBeR dataset](https://ditto.ing.unimore.it/barber/). All three readers receive the same RGB888 pixels and are evaluated with the same ground truth matching rules.
+
+https://github.com/user-attachments/assets/c2996e2c-e05e-4d2a-b1b4-f41b0d71c6c6
+
+## Dependencies
+
+- CMake 3.16 or later
+- A C++20 compiler
+- Dynamsoft Capture Vision SDK placed at `../dcv` (proprietary, not bundled)
+- **Your own** Dynamsoft Barcode Reader license — see [`../licenses/README.md`](../licenses/README.md)
+- Python 3 for result validation and report generation
+- **Scandit Linux SDK 8.7.1** (Linux/amd64 only) and **your own Linux** trial key
+- Docker (Linux containers) to run the three-way benchmark
+
+The `zxing-cpp` directory is a Git submodule pinned at v3.1.1. The bundled Dynamsoft Capture Vision SDK is 3.6.50 / DBR 11.6.50, matching the 11.6.5000 release used by the Python and JavaScript companions.
+
+### Scandit SDK and license
+
+Scandit's Barcode Scanner SDK for Linux is a **C API** shipped as a Debian package from the [Scandit dashboard](https://ssl.scandit.com/dashboard/downloads) (`SDK Installation`). It is **not redistributable**, so it is not committed. Download `scandit-barcodescanner-linux_8.7.1.zip`, then place `libscandit-barcodescanner-8.7.1-amd64.deb` in `third_party/scandit-barcodescanner-linux_8.7.1/`. `Dockerfile` installs it into the container.
+
+Put your Linux trial key in `../licenses/scandit-linux.txt` and the Dynamsoft key in `../licenses/dynamsoft-dbr.txt` (copy the `*.txt.example` templates first; see [`../licenses/README.md`](../licenses/README.md)). **No license key is bundled with this repository** and the filled files are excluded from Git. `DYNAMSOFT_LICENSE_KEY` / `SCANDIT_LICENSE_KEY` can be used instead. The Scandit key is Linux-only, must be created for the Linux platform, and requires network access for activation. Multi-scan needs the "tracking" license feature; when it is missing the adapter falls back to single-code scanning and prints the reason.
+
+## Source layout in this dataset repository
+
+This is an archived copy of `examples/benchmark` from
+[cmake-cpp-barcode-qrcode-mrz](https://github.com/yushulx/cmake-cpp-barcode-qrcode), placed at
+`barber-benchmark/cpp/`. Three external dependencies are **not** bundled and must be provisioned
+before building:
+
+- `zxing-cpp/` — the [ZXing-C++](https://github.com/zxing-cpp/zxing-cpp) submodule pinned at
+  v3.1.1. Clone that tag into this directory, or copy it from the original checkout.
+- `../dcv/` — the Dynamsoft Capture Vision SDK root (proprietary, not redistributable).
+- `third_party/scandit-barcodescanner-linux_8.7.1/*.deb` — Scandit's Linux SDK package from the
+  [Scandit dashboard](https://ssl.scandit.com/dashboard/downloads).
+
+The audited manifests, published results and the HTML report **are** included here, so the
+benchmark can be inspected and re-scored without rebuilding.
+
+## Build (native, two decoders)
+
+The Scandit adapter is compiled only when the Linux SDK headers and library are found. On Windows and macOS the project builds ZXing-C++ and DBR only.
+
+```powershell
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+cmake --build build --config Release --target barcode_benchmark benchmark_tests
+ctest --test-dir build -C Release --output-on-failure
+```
+
+CMake builds ZXing-C++ from the checked-out submodule and copies the required Dynamsoft libraries, templates, and models next to the executable.
+
+## Build and run with Docker (three decoders)
+
+```bash
+tools/run_benchmark_docker.sh smoke   # 10 images, sanity check
+tools/run_benchmark_docker.sh full    # all 7,894 images
+tools/run_benchmark_docker.sh shell   # interactive container
+```
+
+The script expects the `barber-benchmark/` layout (`licenses/`, `dcv/`, `cpp/`) and refuses to
+start if a license key, the DCV SDK or the Scandit `.deb` is missing. Set `BARBER_IMAGES` if the
+dataset lives elsewhere. The default is `D:/images/BarBeR_Dataset/BarBeR - Dataset/dataset/images`.
+It builds `barber-benchmark:scandit-8.7.1`, compiles into `/tmp/build` inside the container, and
+writes results to `results/full_linux/`.
+
+Two Linux-specific details are handled by the script:
+
+1. The Linux DCV build resolves AI models relative to the directory its libraries were **linked from**, not next to the executable. The script stages a private copy of `dcv/` at `/tmp/dcv` with `Models/` beside the libraries.
+2. The stock `DBR-PresetTemplates.json` does not declare `CaptureVisionModelOptions` on Linux, which produces `Model file is not found`. `configs/dbr_preset_templates_linux.json` is the same official preset template with all 21 model declarations added, and is passed via `--dbr-config`.
+
+For a faster full run, several processes can share one `--output` directory while working on disjoint manifest slices with `--start-index` / `--end-index`. `appendResult` uses a cross-process lock and skips existing result keys, so the run is resumable and safe to parallelize. The published run used four slices of the same 7,894-image manifest, all with identical config and manifest hashes.
+
+## Prepare the BarBeR Dataset
+
+The expected dataset layout is:
+
+```text
+BarBeR - Dataset/
+  Annotations/VIA/
+  dataset/images/
+```
+
+Run the audit before every published benchmark.
+
+```powershell
+build/Release/barcode_benchmark.exe audit `
+  --images "D:/images/BarBeR_Dataset/BarBeR - Dataset/dataset/images" `
+  --annotations "D:/images/BarBeR_Dataset/BarBeR - Dataset/Annotations/VIA" `
+  --output manifests
+```
+
+The audit recursively reads every VGG JSON file, validates image availability, validates payload structure, resolves overlapping annotations, and removes exact duplicate images. The generated benchmark manifest contains only unique images with at least one reliable ground truth value.
+
+For the current local dataset, the audit starts from 8,748 image records and 9,818 annotations. It excludes 853 images without reliable ground truth and one exact duplicate image. The final manifest contains 7,894 unique images, 7,894 unique SHA-256 image hashes, and 8,615 ground truth barcode instances. The inventory in `manifests/barber_source_files.json` records every exclusion and the SHA-256 hash of each annotation source.
+
+## Run the Full Benchmark
+
+Supply your own Dynamsoft license: set `DYNAMSOFT_LICENSE_KEY`, or point `--license-key-file` at
+`../licenses/dynamsoft-dbr.txt` (see [`../licenses/README.md`](../licenses/README.md)).
+
+```powershell
+build/Release/barcode_benchmark.exe run `
+  --images "D:/images/BarBeR_Dataset/BarBeR - Dataset/dataset/images" `
+  --manifest manifests/benchmark_manifest.jsonl `
+  --output results/full `
+  --dbr-template ReadBarcodes_Default `
+  --zxing-config configs/zxing_all_supported.json `
+  --license-key-file "../licenses/dynamsoft-dbr.txt" `
+  --repetitions 1
+```
+
+Use `--decoders` to select a subset, for example `--decoders zxing-cpp,dynamsoft-dbr,scandit-linux`. Add `--scandit-license-key-file "../licenses/scandit-linux.txt"`, `--scandit-config` and `--scandit-data-dir` when the Scandit adapter is enabled. `DYNAMSOFT_LICENSE_KEY` and `SCANDIT_LICENSE_KEY` override the key files.
+
+The command is resumable. Each result key contains the sample ID, decoder, and repetition number. Existing keys are skipped safely. The raw stream is stored in `results.jsonl` so a long run can append one complete record at a time. A complete `results.json` package is also written for tools that prefer a single JSON document.
+
+Decode timing starts immediately before the SDK decode call and ends immediately after it returns. Image loading, matching, JSON serialization, console output, and report generation are excluded. For Scandit, only `sc_recognition_context_process_frame` is timed; the surrounding per-image frame-sequence calls and result retrieval are outside the timed region. Decoder order is deterministically shuffled for every image and repetition.
+
+## Validate Results
+
+```powershell
+python tools/validate_results.py `
+  --results results/full_linux/results.jsonl `
+  --summary results/full_linux/summary.json `
+  --expected-images 7894 `
+  --expected-ground-truth 8615 `
+  --expected-repetitions 1
+```
+
+`--expected-ground-truth 8615` is the audited annotation count stored in each record. Scoring excludes 204 `^` placeholders, so recall uses 8,411. A complete three-decoder result file contains 23,682 unique decoder records.
+
+## Benchmark Results
+
+The full run uses one repetition on 7,894 unique BarBeR images in a single Ubuntu 24.04 linux/amd64 container. Recall is correct ground truth matches divided by 8,411 scored ground truth instances. Precision is correct predictions divided by evaluated predictions.
+
+| Decoder | Correct | Recall | Precision | Wrong reads | No read | Mean decode time | Median decode time | P95 decode time |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Dynamsoft Barcode Reader 11.6.50.29329 | 7,863 / 8,411 | 93.48% | 85.83% | 89 (1.06%) | 459 (5.46%) | 444.05 ms | 261.60 ms | 1422.82 ms |
+| Scandit Barcode Scanner SDK 8.7.1 (Linux) | 7,467 / 8,411 | 88.78% | 89.91% | 245 (2.91%) | 699 (8.31%) | 105.73 ms | 89.78 ms | 229.06 ms |
+| ZXing-C++ 3.1.1 | 6,031 / 8,411 | 71.70% | 95.79% | 100 (1.19%) | 2,280 (27.11%) | 70.90 ms | 38.51 ms | 265.90 ms |
+
+Scandit read 1,436 more ground truth barcodes than ZXing-C++ and 396 fewer than DBR, a gap of 4.71 percentage points in recall against DBR and 17.07 points over ZXing-C++. Scandit's precision (89.91%) sits between ZXing-C++ (95.79%) and DBR (85.83%); DBR produced 1,209 extra results in this Linux preset-template configuration, which lowers its precision.
+
+Unsupported-format counts are DBR 192, Scandit 215, ZXing-C++ 227. 192 of these are ROYAL_MAIL instances that the pre-existing canonical format table scores as unsupported for every reader; Scandit additionally lacks JAPAN_POST and POSTNET. Six DBR frames returned 'Operation timeout' and are recorded as decoder_error, never as no-read.
+
+**Timing caveat:** four worker processes handled disjoint manifest slices on 16 logical processors, so absolute decode times include CPU contention. Compare readers only within this run; do not compare these times with the earlier single-process Windows measurement. The Linux DCV build runs the official preset template with deep-learning models and is a different binary from that Windows build.
+
+Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no read** (`not_found + unsupported_format + decoder_error`). Extra results beyond the ground truth affect precision, not this split. `image_all_read_rate` is retained in `summary.json` only as a diagnostic.
+
+## Generate the Report
+
+```powershell
+python tools/generate_html_report.py `
+  --inventory manifests/barber_source_files.json `
+  --environment configs/benchmark_environment.json `
+  --results results/full_linux/results.jsonl `
+  --matching-analysis results/full_linux/matching_analysis.json `
+  --summary results/full_linux/summary.json `
+  --output report/index.html
+```
+
+The HTML report contains the measured summary, a decoder comparison table, method disclosure, full environment details, dataset audit, and per-image raw records.
+
+Regenerate the cover image, poster, and slide video:
+
+```powershell
+python tools/generate_benchmark_media.py `
+  --inventory manifests/barber_source_files.json `
+  --summary results/full_linux/summary.json `
+  --output report/media
+```
+
+## Matching Rules
+
+- Ground truth and predictions are matched one to one as multisets
+- The key is canonical barcode format plus exact normalized payload
+- UPC-A and the equivalent zero-prefixed EAN-13 value are treated as equal
+- CODE_39 start/stop asterisks are stripped before scoring
+- CODE_128 / GS1-128 leading `{GS}`, `{FNC1}`, and ASCII GS markers are stripped before scoring
+- HTML entities, trailing newlines, and a leading `\000001` escape are normalized before scoring
+- Ground truth payload `^` is treated as an unreliable placeholder and excluded from scoring
+- DBR `CODE39EXTENDED` output is treated as `CODE_39`
+- Scandit `ean13upca` covers both EAN-13 and UPC-A; a GS1 carrier flag on `code128` is reported as `GS1_128`
+- Scandit 8.7.1 exposes no `JAPAN_POST` or `POSTNET` symbology, so those ground truth instances are scored as `unsupported_format`
+- Scandit payloads are surfaced as UTF-8 text (invalid bytes are mapped from Latin-1) and the untouched raw bytes are retained as hex
+- Barcode location is not part of the score
+- Unsupported formats remain visible in coverage-adjusted metrics
+- Decoder errors and input pipeline errors are never counted as no-read results
+
+To re-score an existing `results.jsonl` after a matching-rule change, without re-running the decoders:
+
+```powershell
+cmake --build build --config Release --target rematch_results
+build/Release/rematch_results.exe --results results/full_linux/results.jsonl --output results/full_linux
+```
+
+## Reproducibility
+
+Raw records include the decoder name, runtime version, config hash, manifest hash, repetition number, image load time, decode time, predictions, matches, and explicit errors. `results.jsonl` is the append-only raw stream; in this dataset repository it and `summary.json` are shipped so the numbers can be re-checked. The audited manifests, published results and the HTML report are included here; license files, the Dynamsoft DCV SDK, the Scandit Linux SDK, the `zxing-cpp` submodule and build outputs are excluded from Git.
+
+The measured machine and build settings are recorded in `configs/benchmark_environment.json`.
+
+## Blog
+[Benchmark Barcode Reading in C++ with ZXing-C++ and Dynamsoft Barcode Reader](https://www.dynamsoft.com/codepool/benchmark-barcode-reading-cpp-zxing-dynamsoft-barcode-reader.html)
