@@ -156,6 +156,11 @@ Failures are split into **wrong reads** (`wrong_text + wrong_format`) and **no r
 
 ## Generate the Report
 
+The generated page ends with a **Failures to follow up** table: one row per annotation that was
+not read correctly, with the image, the expected symbology and payload, what that reader returned
+for it, the outcome and the decode time. Filter by reader, outcome or format, and export exactly
+the filtered rows as CSV for triage.
+
 ```powershell
 python tools/generate_html_report.py `
   --inventory manifests/barber_source_files.json `

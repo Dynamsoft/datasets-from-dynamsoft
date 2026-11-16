@@ -165,6 +165,11 @@ be restarted and it will skip records already present in `results.jsonl`.
 
 ## Validate and build the report
 
+The generated page ends with a **Failures to follow up** table: one row per annotation that was
+not read correctly, with the image, the expected symbology and payload, what that reader returned
+for it, the outcome and the decode time. Filter by reader, outcome or format, and export exactly
+the filtered rows as CSV for triage.
+
 ```bash
 # structural + count validation
 node tools/validate_results.mjs \
