@@ -8,6 +8,8 @@ repository. The two commercial readers in the BarBeR benchmarks need keys you ap
 | `dynamsoft-dbr.txt` | Web/JS benchmark **and** C++/Linux benchmark (Dynamsoft Barcode Reader) | [Dynamsoft free 30-day trial](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform) |
 | `scandit-web.txt` | Web/JS benchmark (Scandit Data Capture SDK for Web 8.7.1) | [Scandit trial](https://www.scandit.com/trial/) — create a **Web** license |
 | `scandit-linux.txt` | C++/Linux benchmark (Scandit Barcode Scanner SDK for Linux 8.7.1) | [Scandit dashboard](https://ssl.scandit.com/dashboard/) — create a **Linux** license with the **tracking** feature for multi-code scanning |
+| `scanbot-web.txt` | Web/JS benchmark (Scanbot SDK for Web 10.0.0) | [Scanbot trial](https://scanbot.io/trial/) — create a **Web** license bound to `localhost` |
+| `scanbot-linux.txt` | C++/Linux benchmark (Scanbot SDK for Linux) | [Scanbot dashboard](https://scanbot.io/dashboard/) — create an **OperatingSystemStandalone** license with the `BarcodeScanner` feature |
 
 ZXing (ZXing-C++ / zxing-wasm) is open source and needs no license.
 

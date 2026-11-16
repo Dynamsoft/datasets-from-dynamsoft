@@ -16,7 +16,7 @@ import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
 import {
-  PROTOCOL, ZXING, DBR, SCANDIT, DECODERS,
+  PROTOCOL, ZXING, DBR, SCANDIT, SCANBOT, DECODERS,
   sha256File, readJsonl, matchResults, generateSummary,
 } from "./score.mjs";
 
@@ -70,6 +70,7 @@ for (const row of readJsonl(jsonlPath)) {
 const zxingConfigHash = "zxing-wasm:all-supported";
 const dbrConfigHash = `dbr-template:${args.dbrTemplate}`;
 const scanditConfigHash = "scandit:barcode-batch:single-image:16-symbologies";
+const scanbotConfigHash = "scanbot:detectBarcodes:complete-engine:all-formats";
 const SCANDIT_VERSION = "8.7.1";
 let browserEnvironment = null;
 
@@ -110,7 +111,8 @@ function recordFromPost(body) {
     config_sha256:
       body.decoder === ZXING ? zxingConfigHash :
       body.decoder === DBR ? dbrConfigHash :
-      body.decoder === SCANDIT ? scanditConfigHash : "unknown-decoder",
+      body.decoder === SCANDIT ? scanditConfigHash :
+      body.decoder === SCANBOT ? scanbotConfigHash : "unknown-decoder",
     repetition: body.repetition,
     image_load_ns: body.image_load_ns,
     decode_ns: body.decode_ns,
@@ -150,6 +152,8 @@ function writeEnvironment() {
     scandit_core_package: `@scandit/web-datacapture-core ${SCANDIT_VERSION} (local npm, pinned)`,
     scandit_barcode_package: `@scandit/web-datacapture-barcode ${SCANDIT_VERSION} (local npm, pinned)`,
     scandit_mode: "BarcodeBatch / MatrixScan, single ImageFrameSource.fromImageData frame per image",
+    scanbot_package: "scanbot-web-sdk 10.0.0 (local npm, pinned)",
+    scanbot_mode: "detectBarcodes on a JPEG data URL, complete WASM engine, BarcodeFormats.all, single-threaded",
     decoders: ACTIVE_DECODERS,
     browser: browserEnvironment,
     manifest_sha256: manifestSha256,
@@ -227,6 +231,20 @@ const server = http.createServer(async (req, res) => {
         return res.end("not found");
       }
       res.writeHead(200, { "content-type": "application/octet-stream", "cache-control": "no-store" });
+      return fs.createReadStream(file).pipe(res);
+    }
+
+    if (req.method === "GET" && url.pathname.startsWith("/scanbot/")) {
+      const root = path.resolve(ROOT, "node_modules", "scanbot-web-sdk", "bundle");
+      const file = path.resolve(root, decodeURIComponent(url.pathname.slice("/scanbot/".length)));
+      if (!file.startsWith(root) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+        res.writeHead(404);
+        return res.end("not found");
+      }
+      res.writeHead(200, {
+        "content-type": MIME[path.extname(file)] || "application/octet-stream",
+        "cache-control": "no-store",
+      });
       return fs.createReadStream(file).pipe(res);
     }
 

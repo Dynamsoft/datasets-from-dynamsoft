@@ -34,7 +34,7 @@ function parseArgs(argv) {
     repetitions: 1,
     "restart-every": 3000,
     "stall-seconds": 300,
-    decoders: "zxing-wasm,dynamsoft-dbr-js,scandit-web-datacapture",
+    decoders: "zxing-wasm,dynamsoft-dbr-js,scandit-web-datacapture,scanbot-web",
     chrome: "C:/Program Files/Google/Chrome/Application/chrome.exe",
   };
   for (let i = 2; i < argv.length; i++) {
@@ -64,6 +64,7 @@ function loadKey(envName, file) {
 const ACTIVE_DECODERS = args.decoders.split(",").map((s) => s.trim()).filter(Boolean);
 const NEEDS_DBR = ACTIVE_DECODERS.includes("dynamsoft-dbr-js");
 const NEEDS_SCANDIT = ACTIVE_DECODERS.includes("scandit-web-datacapture");
+const NEEDS_SCANBOT = ACTIVE_DECODERS.includes("scanbot-web");
 
 const DYNAMSOFT_KEY = NEEDS_DBR
   ? loadKey("DYNAMSOFT_LICENSE_KEY", path.join(LICENSE_DIR, "dynamsoft-dbr.txt"))
@@ -71,7 +72,10 @@ const DYNAMSOFT_KEY = NEEDS_DBR
 const SCANDIT_KEY = NEEDS_SCANDIT
   ? loadKey("SCANDIT_LICENSE_KEY", path.join(LICENSE_DIR, "scandit-web.txt"))
   : "";
-if ((NEEDS_DBR && !DYNAMSOFT_KEY) || (NEEDS_SCANDIT && !SCANDIT_KEY)) {
+const SCANBOT_KEY = NEEDS_SCANBOT
+  ? loadKey("SCANBOT_LICENSE_KEY", path.join(LICENSE_DIR, "scanbot-web.txt"))
+  : "";
+if ((NEEDS_DBR && !DYNAMSOFT_KEY) || (NEEDS_SCANDIT && !SCANDIT_KEY) || (NEEDS_SCANBOT && !SCANBOT_KEY)) {
   console.error(
     "Both license keys are required. Apply for your own trials, then set\n" +
     "  DYNAMSOFT_LICENSE_KEY and SCANDIT_LICENSE_KEY, or copy the .example files\n" +
@@ -131,7 +135,8 @@ async function openSession() {
     window.__SCANDIT_LICENSE_KEY__ = config.scandit;
     window.__DYNAMSOFT_LICENSE_KEY__ = config.dynamsoft;
     window.__BENCH_DECODERS__ = config.decoders;
-  }, { scandit: SCANDIT_KEY, dynamsoft: DYNAMSOFT_KEY, decoders: ACTIVE_DECODERS });
+    window.__SCANBOT_LICENSE_KEY__ = config.scanbot;
+  }, { scandit: SCANDIT_KEY, dynamsoft: DYNAMSOFT_KEY, scanbot: SCANBOT_KEY, decoders: ACTIVE_DECODERS });
   page.on("pageerror", (err) => console.log("[pageerror]", err.message));
   page.on("console", (msg) => {
     const text = msg.text();

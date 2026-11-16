@@ -24,7 +24,8 @@ export const PROTOCOL = "protocol-js-v2";
 export const ZXING = "zxing-wasm";
 export const DBR = "dynamsoft-dbr-js";
 export const SCANDIT = "scandit-web-datacapture";
-export const DECODERS = [ZXING, DBR, SCANDIT];
+export const SCANBOT = "scanbot-web";
+export const DECODERS = [ZXING, DBR, SCANDIT, SCANBOT];
 
 // zxing-wasm 3.x ships the same zxing-cpp core formats used by the Python harness.
 export const ZXING_SUPPORTED = new Set([
@@ -44,6 +45,14 @@ export const DBR_SUPPORTED = new Set([
 // and their BarBeR annotations are scored as unsupported_format (no-read), the
 // same treatment zxing-wasm gets for formats it cannot decode. EAN13UPCA covers
 // both EAN_13 and UPC_A; the harness splits them by payload length before scoring.
+// Scanbot Web 10.0.0 decodes every BarBeR symbology; BarcodeFormats.all is
+// passed to the engine, so the supported set is the full BarBeR label set.
+export const SCANBOT_SUPPORTED = new Set([
+  "AZTEC", "CODE_128", "GS1_128", "CODE_39", "DATA_MATRIX", "EAN_13",
+  "EAN_8", "EAN_2", "ITF", "IATA_2_OF_5", "USPS_INTELLIGENT_MAIL",
+  "JAPAN_POST", "KIX", "PDF_417", "POSTNET", "QR_CODE", "ROYAL_MAIL",
+  "UPC_A", "UPC_E",
+]);
 export const SCANDIT_SUPPORTED = new Set([
   "AZTEC", "CODE_128", "GS1_128", "CODE_39", "CODE_93", "CODABAR",
   "DATA_MATRIX", "EAN_13", "EAN_8", "ITF", "IATA_2_OF_5", "KIX",
@@ -62,6 +71,8 @@ const FORMAT_MAPPING = {
   JAPANPOST: "JAPAN_POST", KIX: "KIX", PDF417: "PDF_417",
   POSTNET: "POSTNET", QR: "QR_CODE", QRCODE: "QR_CODE",
   ROYALMAILCODE: "ROYAL_MAIL",
+  // Scanbot names KIX after its Dutch operator (Royal TNT Post).
+  ROYALTNTPOST: "KIX",
   // BarBeR spells these three with underscores. canonicalFormat() strips
   // punctuation before lookup, so without these entries the ground-truth names
   // reduce to ROYALMAIL / IATA2OF5 / USPSINTELLIGENTMAIL and match no decoder's
@@ -175,7 +186,8 @@ export function isSupported(decoder, fmt) {
   const supported =
     decoder === ZXING ? ZXING_SUPPORTED :
     decoder === DBR ? DBR_SUPPORTED :
-    decoder === SCANDIT ? SCANDIT_SUPPORTED : DBR_SUPPORTED;
+    decoder === SCANDIT ? SCANDIT_SUPPORTED :
+    decoder === SCANBOT ? SCANBOT_SUPPORTED : DBR_SUPPORTED;
   return supported.has(canonicalFormat(fmt));
 }
 
