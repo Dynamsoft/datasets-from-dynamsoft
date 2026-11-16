@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BarBeR Benchmark — zxing-wasm vs. Dynamsoft DBR vs. Scandit (JavaScript/WASM)</title>
+  <title>BarBeR Benchmark — zxing-wasm vs. Dynamsoft DBR vs. Scandit vs. Scanbot (JavaScript/WASM)</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.2/dist/iife/full/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.6.5000/dist/dbr.bundle.js"></script>
+  <!-- Scanbot is served from the locally pinned npm package (see src/server.mjs). -->
+  <script src="/scanbot/ScanbotSDK.min.js"></script>
   <!-- Scandit is served from the locally pinned npm packages (see src/server.mjs),
        so the run is reproducible and does not depend on a live CDN. -->
   <script type="importmap">

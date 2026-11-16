@@ -31,9 +31,11 @@ import {
 const ZXING_NAME = "zxing-wasm";
 const DBR_NAME = "dynamsoft-dbr-js";
 const SCANDIT_NAME = "scandit-web-datacapture";
+const SCANBOT_NAME = "scanbot-web";
 const ZXING_PINNED = "3.1.2";
 const DBR_PINNED = "11.6.5000";
 const SCANDIT_PINNED = "8.7.1";
+const SCANBOT_PINNED = "10.0.0";
 
 // Every BarBeR-relevant symbology that Scandit 8.7.1 exposes. Scandit has no
 // JAPAN_POST or POSTNET symbology; those annotations are scored as
@@ -77,12 +79,16 @@ let dbrTemplate = "ReadBarcodes_Default";
 let dbrFormats = "";
 // Which decoders this run covers. The headless runner sets it before the page
 // loads so a single decoder can be re-measured without touching the others.
-const ACTIVE_DECODERS = window.__BENCH_DECODERS__ || [ZXING_NAME, DBR_NAME, SCANDIT_NAME];
+const ACTIVE_DECODERS = window.__BENCH_DECODERS__
+  || [ZXING_NAME, DBR_NAME, SCANDIT_NAME, SCANBOT_NAME];
 let zxingVersion = ZXING_PINNED;
 let dbrVersion = DBR_PINNED;
 let scanditVersion = SCANDIT_PINNED;
 let scanditContext = null;
 let scanditBatch = null;
+let scanbotSdk = null;
+let scanbotConfig = null;
+let scanbotVersion = SCANBOT_PINNED;
 let stopRequested = false;
 let sharedCanvas = document.createElement("canvas");
 let sharedCtx = sharedCanvas.getContext("2d", { willReadFrequently: true });
@@ -91,6 +97,7 @@ const stats = {
   [ZXING_NAME]: { images: 0, barcodes: 0, totalDecodeMs: 0 },
   [DBR_NAME]: { images: 0, barcodes: 0, totalDecodeMs: 0 },
   [SCANDIT_NAME]: { images: 0, barcodes: 0, totalDecodeMs: 0 },
+  [SCANBOT_NAME]: { images: 0, barcodes: 0, totalDecodeMs: 0 },
 };
 
 function setStatus(text) {
@@ -183,6 +190,29 @@ async function initSdk() {
     };
   }
 
+  if (runs(SCANBOT_NAME)) {
+    setStatus("Initializing Scanbot SDK…");
+    if (typeof ScanbotSDK === "undefined") throw new Error("ScanbotSDK global missing — script not served?");
+    const scanbotKey = (window.__SCANBOT_LICENSE_KEY__ || "").trim();
+    if (!scanbotKey) {
+      throw new Error("Scanbot license key is required — set SCANBOT_LICENSE_KEY or licenses/scanbot-web.txt");
+    }
+    // allowThreads is left off: the harness page is not cross-origin isolated,
+    // and the other readers are single-threaded per image.
+    scanbotSdk = await ScanbotSDK.initialize({
+      licenseKey: scanbotKey,
+      enginePath: "/scanbot/bin/complete/",
+      allowThreads: false,
+    });
+    scanbotConfig = {
+      barcodeFormatConfigurations: [
+        new ScanbotSDK.Config.BarcodeFormatCommonConfiguration({
+          formats: ScanbotSDK.Config.BarcodeFormats.all,
+        }),
+      ],
+    };
+  }
+
   await fetch("/environment", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -194,6 +224,8 @@ async function initSdk() {
       dynamsoft_bundle: DBR_PINNED,
       dbr_engine: runs(DBR_NAME) ? dbrVersion : "not run",
       dbr_formats: runs(DBR_NAME) ? dbrFormats : "not run",
+      scanbot_engine: runs(SCANBOT_NAME) ? "complete (bundle/bin/complete)" : "not run",
+      scanbot_formats: runs(SCANBOT_NAME) ? "BarcodeFormats.all" : "not run",
       ...(scanditEnvironment || {}),
     }),
   });
@@ -404,6 +436,27 @@ async function postRecord(sample, decoder, decoderVersion, repetition, imageLoad
   });
 }
 
+// Scanbot's headless API takes an encoded image, so the shared canvas is
+// serialized to a JPEG data URL first. That conversion is outside the timed
+// region, like image loading for the other decoders. Passing a raw ImageData
+// object instead was faster but lost 5 of 28 readings on the smoke set, so the
+// encoded path is the one that is measured.
+async function decodeWithScanbot(canvas) {
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+  const begin = performance.now();
+  try {
+    const response = await scanbotSdk.detectBarcodes(dataUrl, scanbotConfig);
+    const decodeNs = Math.round((performance.now() - begin) * 1e6);
+    const predictions = (response.barcodes || []).map((barcode) => ({
+      format: barcode.format,
+      text: barcode.text,
+    }));
+    return { predictions, decodeNs, error: null };
+  } catch (error) {
+    return { predictions: [], decodeNs: Math.round((performance.now() - begin) * 1e6), error: String(error && error.message || error) };
+  }
+}
+
 async function runBenchmark() {
   stopRequested = false;
   el.run.disabled = true;
@@ -449,12 +502,16 @@ async function runBenchmark() {
           result = await decodeWithZxing(sharedCanvas);
         } else if (decoder === DBR_NAME) {
           result = await decodeWithDbr(sharedCanvas);
-        } else {
+        } else if (decoder === SCANDIT_NAME) {
           result = await decodeWithScandit(sharedCanvas);
+        } else {
+          result = await decodeWithScanbot(sharedCanvas);
         }
         await postRecord(
           sample, decoder,
-          decoder === ZXING_NAME ? zxingVersion : decoder === DBR_NAME ? dbrVersion : scanditVersion,
+          decoder === ZXING_NAME ? zxingVersion
+            : decoder === DBR_NAME ? dbrVersion
+            : decoder === SCANDIT_NAME ? scanditVersion : scanbotVersion,
           repetition, loadError ? 0 : imageLoadNs, result
         );
         completedKeys.add(key);
