@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synthetic Barcode Benchmark — zxing-wasm vs. Dynamsoft DBR vs. Scandit (JavaScript/WASM)</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="/sdk/zxing-wasm@3.1.2/dist/iife/full/index.js"></script>
+  <script src="/sdk/dynamsoft-barcode-reader-bundle@11.6.5000/dist/dbr.bundle.js"></script>
+  <!-- Scandit SDK modules are served from the pinned local npm packages. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@scandit/web-datacapture-core": "/scandit/core/build/js/index.js",
+      "@scandit/web-datacapture-barcode": "/scandit/barcode/build/js/index.js",
+      "@scandit/web-datacapture-core/": "/scandit/core/",
+      "@scandit/web-datacapture-barcode/": "/scandit/barcode/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Synthetic Barcode Benchmark — JavaScript / WASM</h1>
+    <p class="subtitle">
+      Compare zxing-wasm 3.1.2, Dynamsoft Barcode Reader 11.6.5000 and Scandit Data Capture SDK 8.7.1
+      on the synthetic image manifest. Image fetch and canvas preparation have a separate timer.
+    </p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Setup</h2>
+      <div class="row">
+        <label for="license">Dynamsoft license key</label>
+        <input id="license" type="password" autocomplete="off" placeholder="Paste your Dynamsoft Barcode Reader trial key (required, apply separately)">
+      </div>
+      <div class="row">
+        <label for="scandit-license">Scandit license key</label>
+        <input id="scandit-license" type="password" autocomplete="off" placeholder="Paste a Scandit web trial license key (required)">
+      </div>
+      <div class="row buttons">
+        <button id="init-btn">Initialize SDKs</button>
+        <button id="run-btn" disabled>Run benchmark</button>
+        <button id="stop-btn" disabled>Stop</button>
+        <button id="finalize-btn" disabled>Finalize &amp; summarize</button>
+      </div>
+      <div id="sdk-status" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Progress</h2>
+      <div class="progress-track"><div id="progress-bar" class="progress-fill"></div></div>
+      <div id="progress-text" class="status">Idle.</div>
+      <div id="live-stats" class="stats"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Summary</h2>
+      <div id="summary"></div>
+    </section>
+  </main>
+
+  <script type="module" src="benchmark.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "color_inverted": true,
+  "max_locations_per_frame_cap": 64,
+  "multi_scan": true,
+  "symbologies": [
+    "aztec",
+    "codabar",
+    "code128",
+    "code39",
+    "code93",
+    "data-matrix",
+    "dotcode",
+    "ean13upca",
+    "ean8",
+    "iata2of5",
+    "itf",
+    "kix",
+    "maxicode",
+    "microqr",
+    "msi-plessey",
+    "pdf417",
+    "qr",
+    "royal-mail-4state",
+    "upce",
+    "usps-intelligent-mail"
+  ]
+}

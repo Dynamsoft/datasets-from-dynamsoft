@@ -1,0 +1,20 @@
+{
+  "measured_at": "2026-11-19T08:11:19.431Z",
+  "os": "win32 10.0.26200",
+  "architecture": "x64",
+  "processor": "13th Gen Intel(R) Core(TM) i5-13400F",
+  "logical_processors": 16,
+  "node": "v24.20.0",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "hardwareConcurrency": 16,
+    "decoders": [
+      "dynamsoft-dbr-js",
+      "zxing-wasm"
+    ],
+    "zxing_wasm": "3.1.2",
+    "dynamsoft_bundle": "11.6.5000",
+    "dbr_engine": "11.6.5000",
+    "dbr_formats": "BF_ALL"
+  }
+}

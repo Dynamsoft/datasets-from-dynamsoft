@@ -1,0 +1,11 @@
+/dataset/
+/dataset-by-format-expanded/
+/.generate-*/
+/.quality-*/
+/.runs/
+/build/
+/node_modules/
+__pycache__/
+/licenses/
+/native/.vendor/
+/browser/node_modules/

@@ -1,0 +1,6 @@
+*.sh text eol=lf
+dataset-by-format/**/*.jpg -text
+dataset-by-format/manifest.jsonl -text
+results/**/results.jsonl -text
+results/**/dynamsoft-settings.json -text
+results/**/scandit-settings.json -text

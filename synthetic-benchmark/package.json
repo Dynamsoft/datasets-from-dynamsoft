@@ -1,0 +1,7 @@
+{
+  "name": "synthetic-barcode-benchmark",
+  "private": true,
+  "dependencies": {
+    "bwip-js": "4.11.4"
+  }
+}

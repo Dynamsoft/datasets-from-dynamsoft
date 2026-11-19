@@ -121,19 +121,16 @@ The 42 `skewed_datamatrix` images are identical to the [skewed-datamatrix](#2-sk
 
 ---
 
-### 7. [barber-benchmark](./barber-benchmark/)
+### 7. [synthetic-benchmark](./synthetic-benchmark/)
 
-Benchmark code and published results built on the public [BarBeR](https://ditto.ing.unimore.it/barber/) real-world dataset (ICPR 2024). Contains two complete three-way comparisons — **Web/JavaScript (WASM)** and **native C++/Linux** — of Dynamsoft Barcode Reader, Scandit and ZXing on the same audited manifest, plus self-contained interactive reports and machine-readable combined results.
+A synthetic still-image dataset and benchmark for Dynamsoft Barcode Reader, Scandit, and ZXing. The C++ / Linux and JavaScript / WebAssembly benchmarks use the same image manifest and scoring rules.
 
 | Field | Details |
 |:------|:--------|
-| Source dataset | 8,748 real images, 9,818 annotations, 12 public sub-datasets, 18 symbologies |
-| Audited manifest | 7,894 unique images / 8,411 scored barcode instances |
-| Decoders | Dynamsoft Barcode Reader, Scandit, ZXing — in both Web and C++ runtimes |
-| Reports | `js/report/index.html`, `cpp/report/index.html`, `results/comparison.html` |
-| Licenses | Trial keys must be applied for by the user; none are bundled |
-
-> The BarBeR images themselves are not redistributed here. See the [benchmark README](./barber-benchmark/README.md) for the dataset description, full results tables and license instructions.
+| Images | 8,000, including 153 mixed-symbology images and 200 background-only controls |
+| Ground truth | 11,372 annotated barcodes across 24 symbologies |
+| Backgrounds | 36 reusable synthetic scenes |
+| Results | [C++ / Linux](./synthetic-benchmark/review/index.html) · [JavaScript / WebAssembly](./synthetic-benchmark/review/browser/index.html) |
 
 ---
 

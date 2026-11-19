@@ -1,0 +1,15 @@
+{
+  "protocol": "synthetic-browser-run-v1",
+  "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+  "decoders": [
+    "dynamsoft-dbr-js",
+    "zxing-wasm"
+  ],
+  "repetitions": 1,
+  "dbr_template": "ReadBarcodes_Default",
+  "versions": {
+    "zxing-wasm": "3.1.2",
+    "dynamsoft-dbr-js": "11.6.5000",
+    "scandit-web-datacapture": "8.7.1"
+  }
+}
