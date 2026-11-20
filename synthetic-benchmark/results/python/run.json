@@ -1,0 +1,94 @@
+{
+  "schema": "synthetic-python-run-v1",
+  "dataset_schema": "synthetic-barcode-v5",
+  "selection": "all",
+  "source_images": 8000,
+  "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+  "results_sha256": "84d3007ca7436c4d9e4d524b8e6599162ac61f01b85c3fb29b7d3b578463919d",
+  "images": 8000,
+  "warmup_calls_per_sdk": 24,
+  "order_seed": 20261119,
+  "decoder_processes": 1,
+  "repetitions": 1,
+  "environment": {
+    "os": "Windows 11",
+    "architecture": "amd64",
+    "processor": "Intel64 Family 6 Model 191 Stepping 2, GenuineIntel",
+    "logical_processors": 16,
+    "python": "3.14.4",
+    "zxing_cpp": "3.1.1",
+    "dynamsoft_capture_vision_bundle": "3.6.5000",
+    "opencv": "5.0.0.93",
+    "numpy": "2.5.4"
+  },
+  "decoders": {
+    "dynamsoft-dbr-python": {
+      "version": "11.6.50.1028 (Algorithm 11.6.50.9329)",
+      "runtime_configuration": "",
+      "settings": {
+        "preset": "ReadBarcodes_Default",
+        "barcode_format_ids": "BF_ALL",
+        "expected_barcodes_count": 0,
+        "max_threads_in_one_task": 1,
+        "config_sha256": "cd06c66204607c5d44fa1f4d822fc852b3733e35852d4f67adf01a67ba981982"
+      },
+      "supported_formats": [
+        "AZTEC",
+        "CODABAR",
+        "CODE_128",
+        "CODE_39",
+        "CODE_93",
+        "DATA_MATRIX",
+        "DOTCODE",
+        "EAN_13",
+        "EAN_8",
+        "GS1_128",
+        "ITF",
+        "KIX",
+        "MAXICODE",
+        "MICRO_QR",
+        "MSI_CODE",
+        "PDF_417",
+        "PHARMACODE_ONE_TRACK",
+        "POSTNET",
+        "QR_CODE",
+        "ROYAL_MAIL",
+        "UPC_A",
+        "UPC_E",
+        "USPS_INTELLIGENT_MAIL"
+      ]
+    },
+    "zxing-python": {
+      "version": "3.1.1",
+      "runtime_configuration": "",
+      "settings": {
+        "formats": "Aztec,Codabar,Code128,Code39,Code93,DataMatrix,EAN13,EAN8,ITF,MaxiCode,MicroQRCode,PDF417,QRCode,UPCA,UPCE",
+        "try_rotate": true,
+        "try_invert": true,
+        "try_downscale": true,
+        "binarizer": "LocalAverage",
+        "text_mode": "Plain",
+        "ean_add_on_symbol": "Read",
+        "max_symbols": "not exposed by the Python wheel"
+      },
+      "supported_formats": [
+        "AZTEC",
+        "CODABAR",
+        "CODE_128",
+        "CODE_39",
+        "CODE_93",
+        "DATA_MATRIX",
+        "EAN_13",
+        "EAN_8",
+        "GS1_128",
+        "ITF",
+        "MAXICODE",
+        "MICRO_QR",
+        "PDF_417",
+        "QR_CODE",
+        "UPC_A",
+        "UPC_E"
+      ]
+    }
+  }
+}

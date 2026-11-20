@@ -22,6 +22,8 @@ NAMES = {
     "dynamsoft-dbr-js": "Dynamsoft Barcode Reader for Web",
     "scandit-web-datacapture": "Scandit Data Capture SDK for Web",
     "zxing-wasm": "zxing-wasm",
+    "dynamsoft-dbr-python": "Dynamsoft Barcode Reader (Python)",
+    "zxing-python": "ZXing-C++ (Python)",
 }
 
 
@@ -53,14 +55,30 @@ def display_row(row):
             [[item["format"], item["text"]] for item in row["predictions"]], row["unsupported"], len(row["wrong"]), outcome]
 
 
-def create_report(dataset, output, run=None, browser_runs=None):
-    if browser_runs:
+def create_report(dataset, output, run=None, browser_runs=None, python_runs=None):
+    if python_runs:
+        from python.score import score_python_run
+
+        summary, samples, rows = score_python_run(dataset, python_runs[0])
+        runtime = "Python"
+        other_runtime = "C++ / Linux"
+        protocol_note = ("Each image is loaded once with OpenCV and the same array is handed to both "
+                         "Python readers. The decode timer covers the reader call and the input "
+                         "conversion it requires.")
+        other_report = ROOT / "review/index.html"
+    elif browser_runs:
         summary, samples, rows = score_full_dataset(dataset, browser_runs)
         runtime = "JavaScript / WebAssembly"
+        other_runtime = "C++ / Linux"
+        protocol_note = ("Each image is loaded into one canvas. The decode timer includes the reader "
+                         "call and the input conversion it requires.")
         other_report = ROOT / "review/index.html"
     else:
         summary, samples, rows = score(dataset, run)
         runtime = "C++ / Linux"
+        other_runtime = "JavaScript / WebAssembly"
+        protocol_note = ("Each SDK receives the same RGB pixels with its supported corpus "
+                         "symbologies enabled. Timing covers the SDK decode call.")
         other_report = ROOT / "review/browser/index.html"
     decoders = tuple(summary["decoders"])
     output.mkdir(parents=True, exist_ok=True)
@@ -70,13 +88,15 @@ def create_report(dataset, output, run=None, browser_runs=None):
         compact_samples.append([key, sample["relative_path"], sample["scenario"], sample["severity"],
                                 sample["background"], sample["width"], sample["height"], sample["effects"],
                                 [[item["format"], item["text"], item["polygon"]] for item in sample["ground_truth"]], results])
-    source_runs = browser_runs or [run]
+    source_runs = browser_runs or python_runs or [run]
     run_files = [{"results": relative(source / "results.jsonl", output),
                   "config": relative(source / "run.json", output),
-                  "environment": relative(source / "environment.json", output) if browser_runs else None}
+                  "environment": relative(source / "environment.json", output)
+                  if (browser_runs or python_runs) and (source / "environment.json").exists() else None}
                  for source in source_runs]
     content = {"summary": summary, "decoders": decoders, "samples": compact_samples,
                "names": {name: NAMES[name] for name in decoders}, "runtime": runtime,
+               "other_runtime": other_runtime, "protocol_note": protocol_note,
                "gallery": gallery(samples), "image_base": relative(dataset, output),
                "links": {"manifest": relative(dataset / "manifest.jsonl", output),
                          "runs": run_files, "other_report": relative(other_report, output),
@@ -95,7 +115,12 @@ if __name__ == "__main__":
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--run", type=Path)
     source.add_argument("--browser-run", type=Path, nargs="+")
+    source.add_argument("--python-run", type=Path, nargs="+")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    output = args.output or ROOT / ("review/browser" if args.browser_run else "review")
-    create_report(args.dataset, output, args.run, args.browser_run)
+    if args.python_run:
+        default_output = ROOT / "review/python"
+    else:
+        default_output = ROOT / ("review/browser" if args.browser_run else "review")
+    output = args.output or default_output
+    create_report(args.dataset, output, args.run, args.browser_run, args.python_run)

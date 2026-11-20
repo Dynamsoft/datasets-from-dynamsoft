@@ -1,0 +1,4 @@
+zxing-cpp==3.1.1
+dynamsoft-capture-vision-bundle==3.6.5000
+numpy==2.5.4
+opencv-python==5.0.0.93

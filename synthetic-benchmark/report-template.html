@@ -175,11 +175,11 @@
   const proportion = (count, total) => number.format(count) + ' (' + pct(count / total) + ')';
   const browser = Boolean(run.browser_measurements);
   $('runtime-heading').textContent = runtime + ' results';
-  $('other-report').textContent = browser ? 'C++ / Linux' : 'JavaScript / WebAssembly';
+  $('other-report').textContent = data.other_runtime ?? (browser ? 'C++ / Linux' : 'JavaScript / WebAssembly');
   $('other-report').href = data.links.other_report;
-  $('protocol-note').textContent = browser
+  $('protocol-note').textContent = data.protocol_note ?? (browser
     ? 'Each image is loaded into one canvas. The decode timer includes the reader call and the input conversion it requires.'
-    : 'Each SDK receives the same RGB pixels with its supported corpus symbologies enabled. Timing covers the SDK decode call.';
+    : 'Each SDK receives the same RGB pixels with its supported corpus symbologies enabled. Timing covers the SDK decode call.');
   $('overall-results').replaceChildren(...decoders.map((reader) => {
     const result = summary.decoders[reader];
     const { mean, p50, p95 } = result.timing_ms;
