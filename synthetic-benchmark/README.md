@@ -2,11 +2,12 @@
 
 A still-image benchmark for barcode readers. The dataset contains **8,000 JPEGs**,
 **11,372 annotated symbols**, **24 symbologies**, and **36 synthetic backgrounds**.
-The native and browser runners use the same manifest and scoring rules.
+The native, browser and Python runners use the same manifest and scoring rules.
 
 - [Browse images by symbology](dataset-by-format/review.html)
 - [Open the C++ / Linux report](review/index.html) and [summary JSON](review/summary.json)
 - [Open the JavaScript / WebAssembly report](review/browser/index.html) and [summary JSON](review/browser/summary.json)
+- [Open the Python report](review/python/index.html) and [summary JSON](review/python/summary.json)
 - [Explore the reusable background scenes](backgrounds/README.md)
 
 ## JavaScript / WebAssembly results
@@ -47,6 +48,21 @@ mode with its temporal duplicate filter disabled. Web returns newly tracked code
 from BarcodeBatch.
 [Scandit Linux settings](https://docs.scandit.com/stable/c_api/struct_sc_barcode_scanner_settings.html) ·
 [Scandit Web BarcodeBatch session](https://docs.scandit.com/8.6/data-capture-sdk/web/barcode-capture/api/barcode-batch-session.html)
+
+## Python results
+
+Measured in one process on Windows 11 with Python 3.14.4, `zxing-cpp` 3.1.1 and
+`dynamsoft-capture-vision-bundle` 3.6.5000 (DBR 11.6.50.1028). Both readers
+receive the same OpenCV ndarray and use `BF_ALL` / the native format list.
+
+| Decoder | Correct images | Image accuracy | Wrong-read images | No read | Incomplete | Mean | Median | P95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Dynamsoft Barcode Reader (Python) | 6,701 / 8,000 | 83.76% | 103 | 827 | 369 | 51.88 ms | 26.06 ms | 152.30 ms |
+| ZXing-C++ (Python) | 3,852 / 8,000 | 48.15% | 56 | 3,828 | 264 | 14.12 ms | 10.53 ms | 43.57 ms |
+
+See [python/README.md](python/README.md) for the runner protocol. The Python
+wheel does not expose `tryHarder` or `maxNumberOfSymbols`, so its ZXing settings
+differ slightly from the native C++ runner even though the version is the same.
 
 ## Scoring
 
@@ -167,6 +183,23 @@ docker run --rm --platform linux/amd64 \
   '
 python report.py --run .runs/native-next
 ```
+
+## Run the Python benchmark
+
+Install the requirements from `python/requirements.txt`, store the Dynamsoft
+license at `licenses/dynamsoft-dbr.txt` (or set `DYNAMSOFT_LICENSE_KEY`), then
+run one pass over the verified corpus and build the report.
+
+```sh
+python -m pip install -r python/requirements.txt
+python python/run_benchmark.py --dataset dataset-by-format --output results/python
+python python/score.py --run results/python --output review/python/summary.json
+python report.py --python-run results/python
+```
+
+`--resume` continues an interrupted pass; `--limit N` runs a smoke test. The
+runner checks the manifest SHA-256 before decoding and records the raw results
+SHA-256 in `run.json`.
 
 The native runner loads each image once as RGB and passes the same frame to
 every SDK. It runs 24 warm-up calls per SDK, shuffles reader order per image with
