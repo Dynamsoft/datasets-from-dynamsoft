@@ -1,0 +1,17 @@
+{
+  "name": "synthetic-barcode-benchmark-browser",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "node src/server.mjs",
+    "benchmark": "node tools/run_headless.mjs"
+  },
+  "dependencies": {
+    "@scandit/web-datacapture-barcode": "8.7.1",
+    "@scandit/web-datacapture-core": "8.7.1",
+    "dynamsoft-barcode-reader-bundle": "11.6.5000",
+    "puppeteer-core": "25.17.0",
+    "zxing-wasm": "3.1.2"
+  }
+}

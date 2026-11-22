@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Synthetic Barcode Images · Browse by Symbology</title>
+<style>
+  :root { color-scheme:light; --ink:#211e1a; --muted:#5c584f; --line:#dfd9d0; --panel:#fff; --accent:#23564a; }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--ink); background:#f8f6f2; font:14px/1.5 system-ui,sans-serif; }
+  main,header>div { width:min(1380px,calc(100% - 32px)); margin:auto; }
+  header { background:#183c32; color:#fff; padding:23px 0 21px; }
+  header p { margin:5px 0 0; color:#dce8df; }
+  h1 { font-size:clamp(24px,4vw,38px); margin:0; }
+  a { color:var(--accent); text-underline-offset:3px; }
+  .controls { display:flex; flex-wrap:wrap; align-items:end; gap:10px 16px; margin:17px 0 12px; }
+  .controls label { display:grid; gap:3px; font-weight:600; }
+  .controls label[hidden] { display:none; }
+  select,button { border:1px solid #bcbab1; border-radius:6px; background:var(--panel); color:inherit; font:inherit; padding:6px 9px; }
+  button { cursor:pointer; }
+  button:disabled { opacity:.46; cursor:default; }
+  :focus-visible { outline:3px solid #327963; outline-offset:2px; }
+  .controls a { padding:7px 0; }
+  .status { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .pages { display:flex; align-items:center; gap:8px; }
+  #grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr)); gap:11px; }
+  .photo { min-width:0; border:1px solid var(--line); background:var(--panel); border-radius:8px; overflow:hidden; }
+  .photo button { display:block; width:100%; padding:0; border:0; border-radius:0; }
+  .photo img { display:block; width:100%; background:#edeae2; aspect-ratio:4/3; object-fit:contain; }
+  .caption { padding:7px 9px 8px; display:grid; gap:2px; }
+  .caption span,footer { color:var(--muted); }
+  footer { display:flex; flex-wrap:wrap; gap:13px; margin:18px 0 27px; }
+  dialog { padding:0; border:1px solid var(--line); width:min(1060px,calc(100vw - 20px)); max-height:95vh; background:var(--panel); color:inherit; border-radius:9px; }
+  dialog::backdrop { background:#111a; }
+  .dialog-head,.detail { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; gap:10px; flex-wrap:wrap; }
+  .detail { display:block; overflow-wrap:anywhere; }
+  .detail p { margin:4px 0; }
+  #large { display:block; width:100%; max-height:70vh; object-fit:contain; background:#e9e6e0; }
+  #empty { padding:20px 0; }
+  @media (max-width:520px) { #grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; } }
+</style>
+<header><div><h1>Synthetic Barcode Images</h1><p id="overview"></p></div></header>
+<main>
+  <div class="controls">
+    <label>Symbology<select id="format"></select></label>
+    <label>Effect<select id="scenario"><option value="">All effects</option></select></label>
+    <label>Label style<select id="appearance"><option value="">All styles</option></select></label>
+    <label>Symbol count<select id="count"><option value="">Any</option><option value="single">One symbol</option><option value="multi">Multiple symbols</option><option value="dense">5–16 symbols</option></select></label>
+    <a id="directory" target="_blank" rel="noopener">Open image folder</a>
+  </div>
+  <div class="status"><span id="range" aria-live="polite"></span><div class="pages"><button id="previous">Previous</button><button id="next">Next</button></div></div>
+  <div id="grid"></div><p id="empty" hidden>No matching images.</p>
+  <footer><a href="inventory.json">Dataset inventory</a><a href="manifest.jsonl">Annotations</a><a id="method">Methodology</a></footer>
+</main>
+<dialog id="detail-dialog" aria-labelledby="detail-title">
+  <div class="dialog-head"><strong id="detail-title"></strong><form method="dialog"><button>Close</button></form></div>
+  <img id="large" alt="">
+  <div class="detail"><p id="attributes"></p><p id="payload"></p><a id="original" target="_blank" rel="noopener">Open original</a></div>
+</dialog>
+<script id="gallery-data" type="application/json">__GALLERY_DATA__</script>
+<script>
+  'use strict';
+  const data = JSON.parse(document.getElementById('gallery-data').textContent);
+  const $ = (id) => document.getElementById(id);
+  const scenes = { clean:'Clean', perspective:'Label perspective', rotation:'Symbol rotation', blur:'Blur', low_resolution:'Low resolution', low_contrast:'Label low contrast', noise:'Noise', inversion:'Label inversion', occlusion:'Partial occlusion', combined:'Combined effects', negative:'No barcode',
+    module_size:'Pixels per module', frame_padding:'Frame padding', frame_rotation:'Frame rotation', frame_perspective:'Frame perspective', frame_crop:'Frame crop', jpeg_compression:'JPEG compression', frame_low_contrast:'Frame low contrast', uneven_lighting:'Uneven lighting', glare:'Glare', motion_blur:'Motion blur', frame_inversion:'Frame inversion', blur_stack:'Gaussian and motion blur', high_density:'High density', symbol_tilt:'Independent symbol rotation' };
+  const styles = { 'paper-label':'Paper label', 'retail-sticker':'Retail sticker', 'direct-print':'Direct print', 'hang-tag':'Hang tag', 'laminated-sticker':'Laminated sticker', none:'No label' };
+  const layouts = { 'close-up':'Close-up', 'mid-shot':'Mid shot', 'wide-shot':'Wide shot', 'edge-positioned':'Near the edge', stacked:'Stacked', 'side-by-side':'Side by side', staggered:'Staggered', clustered:'Clustered', scattered:'Scattered', 'background-only':'Background only', 'dense-grid':'Dense grid' };
+  const labels = { EAN_8:'EAN-8', EAN_13:'EAN-13', GS1_128:'GS1-128', IATA_2_OF_5:'IATA 2 of 5', USPS_INTELLIGENT_MAIL:'USPS Intelligent Mail', QR_CODE:'QR Code', MICRO_QR:'Micro QR', DATA_MATRIX:'Data Matrix', PDF_417:'PDF417', UPC_A:'UPC-A', UPC_E:'UPC-E', ROYAL_MAIL:'Royal Mail (RM4SCC)', DOTCODE:'DotCode', MSI_CODE:'MSI', PHARMACODE_ONE_TRACK:'Single-track Pharmacode', MIXED_SYMBOLOGIES:'Mixed symbologies', NO_BARCODE:'Background-only controls' };
+  const severity = ['', 'Mild', 'Moderate', 'Severe'];
+  const num = new Intl.NumberFormat('en-US');
+  const formatName = (key) => labels[key] ?? key.replaceAll('_', ' ');
+  const node = (tag, text = '') => { const element = document.createElement(tag); element.textContent = text; return element; };
+  $('overview').textContent = `${num.format(data.images)} images · ${data.format_count} symbologies · ${data.background_count} background scenes`;
+  $('method').href = data.method;
+  for (const [key, rows] of Object.entries(data.groups)) $('format').add(new Option(`${formatName(key)} · ${rows.length} images`, key));
+  const all = Object.values(data.groups).flat();
+  const availableEffects = new Set(all.flatMap((row) => [row[3], ...row[10]]));
+  $('count').querySelector('[value=dense]').hidden = all.every((row) => row[6] <= 4);
+  for (const [key, name] of Object.entries(scenes)) {
+    if (availableEffects.has(key)) $('scenario').add(new Option(name, key));
+  }
+  for (const [key, name] of Object.entries(styles)) $('appearance').add(new Option(name, key));
+  const initial = location.hash.slice(1);
+  $('format').value = Object.hasOwn(data.groups, initial) ? initial : 'QR_CODE';
+  const pageSize = 24;
+  let page = 0;
+
+  function inspect(row, group) {
+    const [id, path, background, scenario, layout, style, count, tier, width, height, effects, payloads, capture] = row;
+    $('detail-title').textContent = `${formatName(group)} · ${id}`;
+    const details = [
+      capture.module_size && capture.module_size + ' px/module',
+      capture.frame_padding && 'Frame padding ' + capture.frame_padding + '×',
+      capture.frame_rotation && 'Frame rotation ' + capture.frame_rotation + '°',
+      capture.jpeg_compression && 'JPEG quality ' + capture.jpeg_compression,
+      capture.motion_blur && 'Motion blur ' + capture.motion_blur + ' px',
+      capture.crop && 'Retained width / height ' + capture.crop.retained.map(value => Math.round(value * 100) + '%').join(' / '),
+      capture.blur_stack && 'Gaussian σ ' + capture.blur_stack[0] + ' px, motion blur ' + capture.blur_stack[1] + ' px'
+    ];
+    $('attributes').textContent = [width + ' × ' + height, (count === 1 ? '1 symbol' : count + ' symbols'), scenes[scenario], severity[tier],
+      layouts[layout], styles[style], background, effects.length > 1 ? effects.map((key) => scenes[key]).join(', ') : '',
+      ...details].filter(Boolean).join(' · ');
+    $('payload').textContent = payloads.length ? 'Payload ' + payloads.map(([fmt, text]) =>
+      group === 'MIXED_SYMBOLOGIES' ? formatName(fmt) + ' ' + text : text).join(' / ') : '';
+    $('large').alt = `${formatName(group)} ${id}`;
+    $('large').src = path;
+    $('original').href = path;
+    $('detail-dialog').showModal();
+  }
+
+  function render() {
+    const group = $('format').value;
+    const scenario = $('scenario').value;
+    const appearance = $('appearance').value;
+    const count = $('count').value;
+    const rows = data.groups[group].filter((row) => (!scenario || row[3] === scenario || row[10].includes(scenario))
+      && (!appearance || row[5] === appearance)
+      && (!count || (count === 'single' ? row[6] === 1 : row[6] >= (count === 'dense' ? 5 : 2))));
+    $('directory').href = group === 'NO_BARCODE' ? 'controls/no-barcode/' : `images/${group}/`;
+    const start = page * pageSize;
+    $('grid').replaceChildren(...rows.slice(start, start + pageSize).map((row) => {
+      const [id, path, , scene, layout, style, symbols, tier] = row;
+      const card = node('article');
+      card.className = 'photo';
+      const button = node('button');
+      const img = node('img');
+      img.loading = 'lazy';
+      img.src = path;
+      img.alt = `Enlarge ${id} ${formatName(group)}`;
+      button.append(img);
+      button.addEventListener('click', () => inspect(row, group));
+      const caption = node('div');
+      caption.className = 'caption';
+      const tags = [scenes[scene], severity[tier], layouts[layout], styles[style], symbols > 1 ? `${symbols} symbols` : ''];
+      caption.append(node('strong', id), node('span', tags.filter(Boolean).join(' · ')));
+      card.append(button, caption);
+      return card;
+    }));
+    $('range').textContent = rows.length ? `${num.format(start + 1)}–${num.format(Math.min(start + pageSize, rows.length))} / ${num.format(rows.length)} images` : '0 images';
+    $('empty').hidden = rows.length > 0;
+    $('previous').disabled = page === 0;
+    $('next').disabled = start + pageSize >= rows.length;
+  }
+  $('format').addEventListener('change', () => {
+    for (const id of ['scenario','appearance','count']) $(id).value = '';
+    history.replaceState(null, '', `#${$('format').value}`);
+    page = 0;
+    render();
+  });
+  for (const id of ['scenario','appearance','count']) $(id).addEventListener('change', () => { page = 0; render(); });
+  $('previous').addEventListener('click', () => { --page; render(); });
+  $('next').addEventListener('click', () => { ++page; render(); });
+  render();
+</script>
+</html>

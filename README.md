@@ -121,6 +121,19 @@ The 42 `skewed_datamatrix` images are identical to the [skewed-datamatrix](#2-sk
 
 ---
 
+### 7. [synthetic-benchmark](./synthetic-benchmark/)
+
+A synthetic still-image dataset and benchmark for Dynamsoft Barcode Reader, Scandit, and ZXing. The C++ / Linux and JavaScript / WebAssembly benchmarks use the same image manifest and scoring rules.
+
+| Field | Details |
+|:------|:--------|
+| Images | 8,000, including 153 mixed-symbology images and 200 background-only controls |
+| Ground truth | 11,372 annotated barcodes across 24 symbologies |
+| Backgrounds | 36 reusable synthetic scenes |
+| Results | [C++ / Linux](./synthetic-benchmark/review/index.html) · [JavaScript / WebAssembly](./synthetic-benchmark/review/browser/index.html) |
+
+---
+
 ## Purpose
 
 These datasets are intended for:

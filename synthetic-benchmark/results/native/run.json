@@ -1,0 +1,124 @@
+{
+  "dataset_schema": "synthetic-barcode-v5",
+  "decoder_processes": 1,
+  "decoders": {
+    "dynamsoft-dbr": {
+      "runtime_configuration": "",
+      "settings": {
+        "barcode_format_ids": "BF_ALL",
+        "config_sha256": "9adcef32a909c349f4c88f996073f342784127fa0b92b878b086978aef6eb89b",
+        "expected_barcodes_count": 0,
+        "preset": "ReadBarcodes_Default"
+      },
+      "supported_formats": [
+        "AZTEC",
+        "CODABAR",
+        "CODE_128",
+        "CODE_39",
+        "CODE_93",
+        "DATA_MATRIX",
+        "DOTCODE",
+        "EAN_13",
+        "EAN_8",
+        "GS1_128",
+        "ITF",
+        "KIX",
+        "MAXICODE",
+        "MICRO_QR",
+        "MSI_CODE",
+        "PDF_417",
+        "PHARMACODE_ONE_TRACK",
+        "POSTNET",
+        "QR_CODE",
+        "ROYAL_MAIL",
+        "UPC_A",
+        "UPC_E",
+        "USPS_INTELLIGENT_MAIL"
+      ],
+      "version": "11.6.50.29329"
+    },
+    "scandit-linux": {
+      "runtime_configuration": "multi-scan",
+      "settings": {
+        "color_inverted": true,
+        "config_sha256": "f4f071dde1134070743df4e3c282940c62682f2c9f37527155e904bcf345ea0d",
+        "max_locations_per_frame": 40,
+        "preset": "SC_PRESET_HIGH_EFFORT"
+      },
+      "supported_formats": [
+        "AZTEC",
+        "CODABAR",
+        "CODE_128",
+        "CODE_39",
+        "CODE_93",
+        "DATA_MATRIX",
+        "DOTCODE",
+        "EAN_13",
+        "EAN_8",
+        "GS1_128",
+        "IATA_2_OF_5",
+        "ITF",
+        "KIX",
+        "MAXICODE",
+        "MICRO_QR",
+        "MSI_CODE",
+        "PDF_417",
+        "QR_CODE",
+        "ROYAL_MAIL",
+        "UPC_A",
+        "UPC_E",
+        "USPS_INTELLIGENT_MAIL"
+      ],
+      "version": "8.7.1"
+    },
+    "zxing-cpp": {
+      "runtime_configuration": "",
+      "settings": {
+        "binarizer": "LocalAverage",
+        "formats": "Aztec,Codabar,Code128,Code39,Code93,DataMatrix,EAN13,EAN8,ITF,MaxiCode,MicroQRCode,PDF417,QRCode,UPCA,UPCE",
+        "max_symbols": 255,
+        "text_mode": "Plain",
+        "try_downscale": true,
+        "try_harder": true,
+        "try_invert": true,
+        "try_rotate": true
+      },
+      "supported_formats": [
+        "AZTEC",
+        "CODABAR",
+        "CODE_128",
+        "CODE_39",
+        "CODE_93",
+        "DATA_MATRIX",
+        "EAN_13",
+        "EAN_8",
+        "GS1_128",
+        "ITF",
+        "MAXICODE",
+        "MICRO_QR",
+        "PDF_417",
+        "QR_CODE",
+        "UPC_A",
+        "UPC_E"
+      ],
+      "version": "3.1.1"
+    }
+  },
+  "environment": {
+    "architecture": "x86_64",
+    "compiler": "13.3.0",
+    "kernel": "6.18.58.1-microsoft-standard-WSL2",
+    "logical_processors": 16,
+    "os": "Ubuntu 24.04.5 LTS",
+    "processor": "13th Gen Intel(R) Core(TM) i5-13400F"
+  },
+  "images": 8000,
+  "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+  "order_seed": 20261119,
+  "repetitions": 1,
+  "results_sha256": "ab4d0810289c3005e33863d3304b1b71d9780f25ad66518311dde57f49880cf4",
+  "schema": "synthetic-native-run-v2",
+  "selection": "all",
+  "source_images": 8000,
+  "warmup_calls_per_sdk": 24
+}
