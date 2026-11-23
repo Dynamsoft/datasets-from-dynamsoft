@@ -196,7 +196,7 @@
       "retail-sticker": 1574
     },
     "barcodes": 11372,
-    "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+    "manifest_sha256": "588e834e2343ce69eb8ceaba0995898d2b51d0f42f66eac8868652c30040e077",
     "by_subset": {
       "base": 4876,
       "capture": 2304,
@@ -226,18 +226,6 @@
       "retained_edge_luma": 6
     },
     "rerenders": 401,
-    "quality_refresh": {
-      "source_manifest_sha256": "be15266666a8c510ac8cd660d764f1068179f38e8291a7abf4c9d54306be58b9",
-      "seed": 20261719,
-      "replaced": 1084,
-      "generation": 2,
-      "benchmark_targets": 1058,
-      "reasons": {
-        "all_readers_incomplete": 952,
-        "excessive_perspective": 122,
-        "occluded_finder": 10
-      }
-    },
     "geometry_rule": {
       "min_corner_sine": 0.6,
       "min_opposite_edge_ratio": 0.5,
@@ -245,7 +233,7 @@
     }
   },
   "run": {
-    "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+    "manifest_sha256": "588e834e2343ce69eb8ceaba0995898d2b51d0f42f66eac8868652c30040e077",
     "decoders": {
       "dynamsoft-dbr-js": {
         "version": "11.6.5000",

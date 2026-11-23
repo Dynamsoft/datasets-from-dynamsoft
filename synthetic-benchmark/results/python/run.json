@@ -3,7 +3,7 @@
   "dataset_schema": "synthetic-barcode-v5",
   "selection": "all",
   "source_images": 8000,
-  "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+  "manifest_sha256": "588e834e2343ce69eb8ceaba0995898d2b51d0f42f66eac8868652c30040e077",
   "results_sha256": "84d3007ca7436c4d9e4d524b8e6599162ac61f01b85c3fb29b7d3b578463919d",
   "images": 8000,
   "warmup_calls_per_sdk": 24,

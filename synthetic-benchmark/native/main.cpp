@@ -151,25 +151,15 @@ void shutdownDecoders(Decoders& decoders, int status)
     watchdog.join();
 }
 
-enum class Selection { All, Replacements };
-
-bool selects(const json& sample, Selection selection, int generation)
-{
-    return selection == Selection::All || (!sample.value("replaces_sample_id", std::string{}).empty()
-        && sample.value("replacement_generation", 1) == generation);
-}
-
 int run(const fs::path& dataset, const fs::path& output, const fs::path& symbologies,
-        const fs::path& reference, Selection selection, Decoders& decoders)
+        const fs::path& reference, Decoders& decoders)
 {
     const auto dbr_key = requireLicense("DYNAMSOFT_LICENSE_KEY");
     const auto manifest_path = dataset / "manifest.jsonl";
     std::ifstream manifest(manifest_path, std::ios::binary);
     if (!manifest) throw std::runtime_error("Cannot open manifest: " + manifest_path.string());
     const auto inventory = loadJson(dataset / "inventory.json");
-    const auto expected = selection == Selection::Replacements
-        ? inventory.at("quality_refresh").at("replaced").get<std::size_t>() : inventory.at("images").get<std::size_t>();
-    const int generation = selection == Selection::Replacements ? inventory.at("quality_refresh").value("generation", 1) : 0;
+    const auto expected = inventory.at("images").get<std::size_t>();
     const auto manifest_hash = bench::sha256File(manifest_path);
     if (inventory.at("manifest_sha256") != manifest_hash)
         throw std::runtime_error("Manifest hash differs from inventory");
@@ -212,7 +202,6 @@ int run(const fs::path& dataset, const fs::path& output, const fs::path& symbolo
     int calls = 0;
     for (std::string line; calls < warmup_images && std::getline(manifest, line);) {
         const auto sample = json::parse(line);
-        if (!selects(sample, selection, generation)) continue;
         const auto image = loadSample(dataset, sample);
         for (const auto index : order) {
             const auto attempt = decoders[index]->decode(image);
@@ -233,7 +222,6 @@ int run(const fs::path& dataset, const fs::path& output, const fs::path& symbolo
     for (std::string line; std::getline(manifest, line);) {
         ++total;
         const auto sample = json::parse(line);
-        if (!selects(sample, selection, generation)) continue;
         const auto sample_id = sample.at("sample_id").get<std::string>();
         const auto begin = Clock::now();
         const auto image = loadSample(dataset, sample);
@@ -266,15 +254,12 @@ int run(const fs::path& dataset, const fs::path& output, const fs::path& symbolo
     const json environment = {{"os", firstValue("/etc/os-release", "PRETTY_NAME=")}, {"kernel", platform.release},
         {"architecture", platform.machine}, {"processor", firstValue("/proc/cpuinfo", "model name\t:")},
         {"logical_processors", sysconf(_SC_NPROCESSORS_ONLN)}, {"compiler", __VERSION__}};
-    const char* selection_name = "all";
-    if (selection == Selection::Replacements) selection_name = "replacement-images";
     json run_metadata = {{"schema", "synthetic-native-run-v2"}, {"dataset_schema", inventory.at("schema")},
-        {"selection", selection_name}, {"source_images", total},
+        {"selection", "all"}, {"source_images", total},
         {"manifest_sha256", manifest_hash},
         {"results_sha256", bench::sha256File(output / "results.jsonl")}, {"images", count},
         {"warmup_calls_per_sdk", calls}, {"order_seed", 20261119},
         {"decoder_processes", 1}, {"repetitions", 1}, {"environment", environment}, {"decoders", decoder_metadata}};
-    if (selection == Selection::Replacements) run_metadata["replacement_generation"] = generation;
     saveJson(output / "run.json", run_metadata);
     std::cout << "Complete: " << count << " images across " << order.size() << " readers" << std::endl;
     return 0;
@@ -283,18 +268,14 @@ int run(const fs::path& dataset, const fs::path& output, const fs::path& symbolo
 
 int main(int argc, char** argv)
 {
-    const auto option = argc == 6 ? std::string_view(argv[5]) : std::string_view{};
-    Selection selection = Selection::All;
-    if (option == "--replacements-only") selection = Selection::Replacements;
-    if (argc != 5 && selection == Selection::All) {
-        std::cerr << "Usage: synthetic_benchmark DATASET OUTPUT SYMBOLOGIES_JSON DBR_REFERENCE_JSON "
-                     "[--replacements-only]\n";
+    if (argc != 5) {
+        std::cerr << "Usage: synthetic_benchmark DATASET OUTPUT SYMBOLOGIES_JSON DBR_REFERENCE_JSON\n";
         return 2;
     }
     Decoders decoders;
     int status = 1;
     try {
-        status = run(argv[1], argv[2], argv[3], argv[4], selection, decoders);
+        status = run(argv[1], argv[2], argv[3], argv[4], decoders);
     } catch (const std::exception& error) {
         std::cerr << error.what() << std::endl;
     }

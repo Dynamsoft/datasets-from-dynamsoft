@@ -1,6 +1,6 @@
 {
   "protocol": "synthetic-browser-run-v1",
-  "manifest_sha256": "45fa7bebd0b158ea4f46b36ecf46f470ec9f08c1680cbc8147e79c02d7cd0645",
+  "manifest_sha256": "588e834e2343ce69eb8ceaba0995898d2b51d0f42f66eac8868652c30040e077",
   "decoders": [
     "scandit-web-datacapture"
   ],

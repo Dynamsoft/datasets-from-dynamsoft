@@ -105,9 +105,8 @@ The generator bounds projected shape distortion, preserves QR and Micro QR
 finder patterns, and limits synthetic occlusion to 22% of a symbol. Blur and
 downsampling account for barcode module size. The image quality screen uses the
 encoder mask to measure expected dark-to-light transitions in the final JPEG.
-Perceptual hashes and color thumbnails screen for near-duplicates. Corpus
-curation also used readability observations from the native readers, so the
-reported results describe performance on this curated comparison set.
+Perceptual hashes and color thumbnails screen for near-duplicates, and every
+accepted frame is recorded in the manifest before any reader runs.
 
 ### Generate and verify a new corpus
 
