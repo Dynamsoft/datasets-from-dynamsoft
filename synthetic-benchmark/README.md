@@ -108,9 +108,9 @@ encoder mask to measure expected dark-to-light transitions in the final JPEG.
 Perceptual hashes and color thumbnails screen for near-duplicates, and every
 accepted frame is recorded in the manifest before any reader runs.
 
-### Generate and verify a new corpus
+### Generate and verify a new dataset
 
-The following commands create a fresh 8,000-image corpus. Use the report's
+The following commands create a fresh 8,000-image dataset. Use the report's
 manifest and corresponding JPEGs to reproduce the exact benchmark inputs.
 
 ```sh
@@ -187,7 +187,7 @@ python report.py --run .runs/native-next
 
 Install the requirements from `python/requirements.txt`, store the Dynamsoft
 license at `licenses/dynamsoft-dbr.txt` (or set `DYNAMSOFT_LICENSE_KEY`), then
-run one pass over the verified corpus and build the report.
+run one pass over the verified dataset and build the report.
 
 ```sh
 python -m pip install -r python/requirements.txt
