@@ -2,12 +2,13 @@
 
 A still-image benchmark for barcode readers. The dataset contains **8,000 JPEGs**,
 **11,372 annotated symbols**, **24 symbologies**, and **36 synthetic backgrounds**.
-The native, browser and Python runners use the same manifest and scoring rules.
+The native, browser, Python and Android runners use the same manifest and scoring rules.
 
 - [Browse images by symbology](dataset-by-format/review.html)
 - [Open the C++ / Linux report](review/index.html) and [summary JSON](review/summary.json)
 - [Open the JavaScript / WebAssembly report](review/browser/index.html) and [summary JSON](review/browser/summary.json)
 - [Open the Python report](review/python/index.html) and [summary JSON](review/python/summary.json)
+- [Open the Android summary JSON](review/android/summary.json) — Dynamsoft Barcode Reader vs Google ML Kit on an OPPO PLG110
 - [Explore the reusable background scenes](backgrounds/README.md)
 
 ## JavaScript / WebAssembly results
@@ -63,6 +64,31 @@ receive the same OpenCV ndarray and use `BF_ALL` / the native format list.
 See [python/README.md](python/README.md) for the runner protocol. The Python
 wheel does not expose `tryHarder` or `maxNumberOfSymbols`, so its ZXing settings
 differ slightly from the native C++ runner even though the version is the same.
+
+## Android results
+
+Measured on one device: an OPPO PLG110 running Android 17, 8,000 images uploaded
+one at a time to the app's HTTP endpoint over USB. Dynamsoft runs the built-in
+`ReadBarcodes_Default` preset with `BarcodeFormatIds` widened to `BF_ALL`; ML Kit
+uses `FORMAT_ALL_FORMATS`. The full pass took 23 minutes with no failed requests.
+
+| Decoder | Correct images | Image accuracy | Wrong-read images | No read | Incomplete | Mean | Median | P95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Dynamsoft Barcode Reader 11.6.4000 (BF_ALL) | 6,374 / 8,000 | 79.68% | 71 | 1,173 | 382 | 62.58 ms | 35.00 ms | 187.00 ms |
+| Google ML Kit barcode-scanning 17.3.0 | 4,101 / 8,000 | 51.26% | 53 | 3,527 | 319 | 48.29 ms | 45.00 ms | 95.00 ms |
+
+Symbol recall is **81.08% (9,220 / 11,372)** for Dynamsoft against **49.27%
+(5,603 / 11,372)** for ML Kit, at 99.18% and 99.06% precision. Neither reader
+returned a prediction on any of the 200 control images.
+
+Most of the difference is format coverage. ML Kit implements 13 symbologies, and
+GS1-128 decodes through its Code 128 reader, so 14 of the 24 are reachable: the
+other 4,789 symbols (ten symbologies) have no decoder at all. On the 14 shared
+formats the split is **92.53% against 85.11%** over 6,583 symbols, and on the
+4,688 images whose symbols are all inside that set, 91.2% against 87.5% of images
+decode exactly. Dynamsoft has no IATA 2 of 5 decoder either, so those 474 symbols
+are outside its supported list and are excluded from its supported recall the same
+way the native run excludes them.
 
 ## Scoring
 
@@ -203,3 +229,34 @@ SHA-256 in `run.json`.
 The native runner loads each image once as RGB and passes the same frame to
 every SDK. It runs 24 warm-up calls per SDK, shuffles reader order per image with
 a fixed seed, and measures the decode calls separately from image loading.
+
+## Run the Android benchmark
+
+The app lives at [android/mlkit-dbr-benchmark](android/mlkit-dbr-benchmark) — the
+same source as `examples/mlkit-dbr-benchmark` in
+[yushulx/android-camera-barcode-mrz-document-scanner](https://github.com/yushulx/android-camera-barcode-mrz-document-scanner).
+Build it with the Android SDK, install it on a device, open the app and switch on
+**Web Server**. The screen shows the phone's address; over USB you do not need it.
+
+```sh
+cd android/mlkit-dbr-benchmark && ./gradlew.bat installDebug   # or open it in Android Studio
+adb forward tcp:18081 tcp:8080                                  # phone:8080 -> localhost:18081
+python android/run_benchmark.py --dataset dataset-by-format   --output .runs/android-next/results.jsonl --decoders dbr,mlkit
+python android/score_android.py --results .runs/android-next/results.jsonl   --output review/android/summary.json
+python android/digest.py --summary review/android/summary.json
+```
+
+`run_benchmark.py` posts each JPEG to `POST /api/benchmark` as multipart form data
+(`file`, `fileType=image`, optional `decoders`), appends the raw JSON response to
+the output file and resumes from it after an interruption. Pass `--adb <path>` and
+it restarts the app automatically if the server dies mid-pass.
+
+`score_android.py` imports `score_rows` from the repository's own `score.py`, so
+image outcomes, per-symbol matching and the format normalisation are identical to
+the native and browser runs. `digest.py` prints the article-ready tables. Run both
+with the Python that has this repository's dependencies installed.
+
+The `--decoders` list also accepts `zxing`, which pulls in ZXing-C++ 3.1.1. Leave it
+off: the zxing-cpp Android wrapper raises a JNI `Invalid BarcodeFormat` abort on a
+small number of images, which kills the process no matter what the Java side does.
+`BenchmarkConfig.ENABLE_ZXING` is `false` for that reason.
