@@ -232,9 +232,8 @@ a fixed seed, and measures the decode calls separately from image loading.
 
 ## Run the Android benchmark
 
-The app lives at [android/mlkit-dbr-benchmark](android/mlkit-dbr-benchmark) — the
-same source as `examples/mlkit-dbr-benchmark` in
-[yushulx/android-camera-barcode-mrz-document-scanner](https://github.com/yushulx/android-camera-barcode-mrz-document-scanner).
+The app lives at [android/mlkit-dbr-benchmark](android/mlkit-dbr-benchmark) and the
+runner scripts next to it, so the dataset, the app and the scorer are one clone.
 Build it with the Android SDK, install it on a device, open the app and switch on
 **Web Server**. The screen shows the phone's address; over USB you do not need it.
 

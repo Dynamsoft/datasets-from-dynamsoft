@@ -2,12 +2,11 @@
 
 A professional Android benchmarking application that compares **Dynamsoft Barcode Reader SDK** vs **Google ML Kit** barcode scanning performance across multiple input sources.
 
-This copy lives inside the synthetic benchmark repository so an on-device run needs
-nothing but this directory: build it, start its HTTP server, and drive it with
-[`android/run_benchmark.py`](../run_benchmark.py). The same app is published as
-`examples/mlkit-dbr-benchmark` in
-[yushulx/android-camera-barcode-mrz-document-scanner](https://github.com/yushulx/android-camera-barcode-mrz-document-scanner/tree/main/examples/mlkit-dbr-benchmark);
-this tree is the one the results in `review/android/summary.json` were produced with.
+This app lives inside the synthetic benchmark repository, next to the dataset it
+measures and the runner that drives it, so an on-device run needs nothing but this
+clone: build the app, start its HTTP server, and run
+[`android/run_benchmark.py`](../run_benchmark.py). The results in
+`review/android/summary.json` were produced from exactly this tree.
 
 https://github.com/user-attachments/assets/a30de920-1bda-4024-b6a9-7de459e163ae
 
@@ -49,8 +48,8 @@ Both SDKs support a wide range of barcode formats including:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yushulx/android-camera-barcode-mrz-document-scanner.git
-cd android-camera-barcode-mrz-document-scanner/examples/mlkit-dbr-benchmark
+git clone https://github.com/Dynamsoft/datasets-from-dynamsoft.git
+cd datasets-from-dynamsoft/synthetic-benchmark/android/mlkit-dbr-benchmark
 ```
 
 ### 2. Open in Android Studio
