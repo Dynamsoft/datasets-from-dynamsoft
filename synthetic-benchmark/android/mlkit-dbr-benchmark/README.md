@@ -64,10 +64,14 @@ preset and widens `barcodeFormatIds` to `BF_ALL`, because the preset's `BF_DEFAU
 omits postal codes, MaxiCode, DotCode, MSI, Pharmacode and Micro QR. The same method
 lets `USE_CUSTOM_TEMPLATE` replace the preset with a full template JSON.
 
-`BenchmarkConfig.ENABLE_ZXING` defaults to `false`: the zxing-cpp Android wrapper
+`BenchmarkConfig.ENABLE_ZXING` defaults to `false`. The zxing-cpp Android wrapper
 aborts the process on a small number of images (`JNI ... Invalid BarcodeFormat`
-followed by SIGABRT), so the third reader is compiled in but never called and its UI
-entries are hidden. Set it to `true` to bring the reader back.
+followed by SIGABRT) in 3.0.2 and 3.1.1 alike, and narrowing the reader to the 15
+scored formats still ended a 1,300-image pass around image 1,076. The reader is
+therefore compiled in but never called: the home-screen entry stays visible at 45%
+alpha and explains itself on tap, and the result screen drops the ZXing column.
+Everything behind the switch is intact, so setting it to `true` brings the reader
+back for a build that can live with the crash.
 
 ### 4. License Key
 
