@@ -2,13 +2,14 @@
 
 A still-image benchmark for barcode readers. The dataset contains **8,000 JPEGs**,
 **11,372 annotated symbols**, **24 symbologies**, and **36 synthetic backgrounds**.
-The native, browser, Python and Android runners use the same manifest and scoring rules.
+The native, browser, Python, Android and iOS runners use the same manifest and scoring rules.
 
 - [Browse images by symbology](dataset-by-format/review.html)
 - [Open the C++ / Linux report](review/index.html) and [summary JSON](review/summary.json)
 - [Open the JavaScript / WebAssembly report](review/browser/index.html) and [summary JSON](review/browser/summary.json)
 - [Open the Python report](review/python/index.html) and [summary JSON](review/python/summary.json)
 - [Open the Android summary JSON](review/android/summary.json) — Dynamsoft Barcode Reader vs Google ML Kit on an OPPO PLG110
+- [Open the iOS summary JSON](review/ios/summary.json) — four readers on an iPhone 11
 - [Explore the reusable background scenes](backgrounds/README.md)
 
 ## JavaScript / WebAssembly results
@@ -89,6 +90,36 @@ formats the split is **92.53% against 85.11%** over 6,583 symbols, and on the
 decode exactly. Dynamsoft has no IATA 2 of 5 decoder either, so those 474 symbols
 are outside its supported list and are excluded from its supported recall the same
 way the native run excludes them.
+
+## iOS results
+
+Measured on one device: an iPhone 11 (iPhone12,1) running iOS 26.6.1, 8,000 images
+uploaded one at a time to the app's HTTP endpoint over the USB link. Dynamsoft runs
+the built-in `ReadBarcodes_Default` preset with `barcodeFormatIds` widened to
+`BF_ALL`; ML Kit uses `FORMAT_ALL_FORMATS`; ZXing-C++ uses the same reader options
+as the C++ runner, including its 15-format list. The full pass took 25 minutes.
+
+| Decoder | Correct images | Image accuracy | Wrong-read images | No read | Incomplete | Mean | Median | P95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Dynamsoft Barcode Reader 11.6.5000 (BF_ALL) | 6,382 / 8,000 | 79.77% | 78 | 1,166 | 374 | 54.15 ms | 32.05 ms | 131.60 ms |
+| Google ML Kit 8.0.0 | 4,103 / 8,000 | 51.29% | 60 | 3,517 | 320 | 32.46 ms | 29.95 ms | 64.00 ms |
+| Apple Vision (VNDetectBarcodesRequest) | 3,998 / 8,000 | 49.98% | 31 | 3,728 | 243 | 39.88 ms | 30.00 ms | 98.00 ms |
+| ZXing-C++ 3.1.1 | 3,812 / 8,000 | 47.65% | 55 | 3,872 | 261 | 38.56 ms | 31.10 ms | 111.20 ms |
+
+Symbol recall is **81.27% (9,242 / 11,372)** for Dynamsoft against 49.16% for ML Kit,
+50.03% for Apple Vision and 48.80% for ZXing-C++, at 99.12%, 98.90%, 99.46% and 98.95%
+precision. None of the four readers returned a prediction on any of the 200
+background-only controls. On the 14 formats all four implement, the split is **92.59%**
+for Dynamsoft, 86.42% for Apple Vision, 84.92% for ML Kit and 77.46% for ZXing-C++.
+
+Two settings move these numbers more than the choice of SDK, and both are easy to miss
+on iOS. The Dynamsoft preset ships `BF_DEFAULT`, which leaves MaxiCode, DotCode, postal
+codes, MSI and Pharmacode undecoded until `barcodeFormatIds` is widened to `BF_ALL`. And
+Xcode's Debug configuration compiles zxing-cpp's C++ core at `-O0`: one 4032 x 3024 frame
+took 9,657 ms to decode in Debug and 690 ms in Release, with identical results. Run a
+Release build, or the ZXing-C++ row measures the build configuration rather than the
+reader. Every iOS ZXing-C++ row here lands within a point of the native Linux pass,
+which is the check that the integration is configured like the C++ runner.
 
 ## Scoring
 
@@ -259,3 +290,32 @@ The `--decoders` list also accepts `zxing`, which pulls in ZXing-C++ 3.1.1. Leav
 off: the zxing-cpp Android wrapper raises a JNI `Invalid BarcodeFormat` abort on a
 small number of images, which kills the process no matter what the Java side does.
 `BenchmarkConfig.ENABLE_ZXING` is `false` for that reason.
+
+## Run the iOS benchmark
+
+The app and the runner scripts live under [ios/](ios), so the dataset, the app and
+the scorer are one clone. Install ML Kit through CocoaPods, open
+`BarcodeBenchmark.xcworkspace`, and build the shared scheme — it builds Release on
+purpose (see [ios/README.md](ios/README.md#build-configuration)). Launch the app; the
+HTTP endpoint comes up on port 8080 by itself and the screen shows the address.
+
+```sh
+cd ios && pod install && open BarcodeBenchmark.xcworkspace
+python ios/run_benchmark.py --dataset dataset-by-format \
+  --host 169.254.35.41 --output .runs/ios-next/results.jsonl
+python ios/score_ios.py --results .runs/ios-next/results.jsonl \
+  --output review/ios/summary.json --device "iPhone 11, iOS 26.6.1"
+```
+
+`--host` accepts the Wi-Fi address the app prints or the USB link address
+(`169.254.x.x`, visible in `arp -a` as `<name>-iphone.local`). The runner posts each
+JPEG to `POST /api/benchmark` on a fresh connection — the app's listener drops the
+socket after every response, and reusing it costs about 1.5 s of stalled read — then
+appends the raw JSON and resumes from it after an interruption. `--restart-cmd` can
+relaunch the app automatically when a socket wedges.
+
+`score_ios.py` imports `score_rows` from the repository's own `score.py`, so image
+outcomes and per-symbol matching match the native, browser, Python and Android runs.
+The iOS ZXing-C++ numbers land within a point of the native Linux pass (47.65% versus
+48.15% exact images, 55 versus 56 wrong-read images), which is the check that the
+integration is configured like the C++ runner rather than tuned to the corpus.
